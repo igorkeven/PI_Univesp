@@ -32,6 +32,55 @@
     font-size: 28px;
     margin-bottom: 20px;
   }
+
+  .menu {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: right;
+  }
+
+  /* estilo e icone do carrinho */
+  
+  
+  .carrinho {
+    position: absolute; 
+    top: 0;
+    right: 0;
+    margin-right: 7%;
+  }
+  
+  .carrinho i::before {
+    content: " ";
+  }
+  
+
+  .carrinho:hover img {
+    position: absolute; 
+    top: 0;
+    right: -40;
+
+  }
+
+  .text {
+    display: none;
+    padding: 5px;
+    border-radius: 5px;
+    top: 20px;
+    right: 0px;
+    z-index: 1;
+    font-size: 18px;
+    white-space: nowrap;
+    cursor: pointer;
+    position: absolute;
+    background-color: #333;
+    color: #fff;
+  }
+
+  
+  .carrinho:hover .text {
+    display: inline-block;
+  }
   
   /* Estilos para os produtos */
   #produtos {
@@ -138,12 +187,6 @@ body {
     margin: 0;
   }
   
-  /* Define o estilo do carrinho de compras */
-  #cart {
-    float: right;
-    font-size: 20px;
-    margin-top: 5px;
-  }
   
   /* Define o estilo dos produtos */
   .produto {

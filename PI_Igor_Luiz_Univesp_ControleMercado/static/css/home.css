@@ -253,5 +253,14 @@ body {
   }
   
   
-
-  
+/* estilo do perfil do artesão
+  .perfil {
+    position: fixed;
+    top: 10;
+    left: 0;
+    width: 15%;
+    height: 100%;
+    background-color: #626ae5;
+    padding: 20px;
+  }
+   */

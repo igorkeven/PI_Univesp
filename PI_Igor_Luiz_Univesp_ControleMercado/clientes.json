@@ -1,10 +1,12 @@
 [
     {
-        "nome": "igor@igor.com",
+        "nome":"igor keven",
+        "email": "igor@igor.com",
         "senha": "123"
     },
     {
-        "nome": "luiz@luiz.com",
+        "nome":"Luiz Eduardo",
+        "email": "luiz@luiz.com",
         "senha": "123"
     }
 ]

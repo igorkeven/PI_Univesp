@@ -2,6 +2,10 @@
 
 from flask import Flask, render_template,request,redirect,flash,session
 import json
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
 
 app = Flask(__name__)
 
@@ -63,7 +67,7 @@ def acessoArtesao():
 
         for artesao in listaArtesao:  # loop para separar os dados 
 
-            if email == artesao['nome'] and senha == artesao['senha']:#verificação se os dados escrito pelo usuario são iguais os salvos 
+            if email == artesao['email'] and senha == artesao['senha']:#verificação se os dados escrito pelo usuario são iguais os salvos 
                 return render_template('html/artesao.html')
             else:
               #  flash('Email ou senha incorretos')
@@ -77,6 +81,27 @@ def esqueceuSenha():
 
 
 
+
+# função para enviar o email 
+def enviar_email(destinatario, senha):
+    remetente = "seu_email@gmail.com"
+    senha_remetente = "sua_senha"
+
+    mensagem = MIMEMultipart()
+    mensagem['From'] = remetente
+    mensagem['To'] = destinatario
+    mensagem['Subject'] = "Recuperação de senha"
+
+    texto = f"Sua senha é {senha}."
+    mensagem.attach(MIMEText(texto, 'plain'))
+
+    servidor_smtp = smtplib.SMTP('smtp.gmail.com', 587)
+    servidor_smtp.starttls()
+    servidor_smtp.login(remetente, senha_remetente)
+    servidor_smtp.sendmail(remetente, destinatario, mensagem.as_string())
+    servidor_smtp.quit()
+
+
 # verificação de email ja cadastrado e envio de email com a senha
 @app.route('/enviarEmail', methods=['POST'])
 def enviarEmail():
@@ -87,10 +112,8 @@ def enviarEmail():
         for usuario in listaCadastrados:  # loop para separar os dados 
 
             if email == usuario['nome'] :#verificação se os dados escrito pelo usuario são iguais os salvos 
-
+                enviar_email(email, usuario['senha'])
                 # flash(f'Senha enviada para seu Email {email} ')
-                print(usuario['nome'])
-                print(usuario['senha'])
                 return redirect('/esqueceuSenha') # codigo para enviar o email com a senha
 
             else:

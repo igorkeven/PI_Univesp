@@ -1,10 +1,18 @@
 [
     {
-        "nome": "igor@igor.com",
-        "senha": "123"
+        "email": "igor@igor.com",
+        "senha": "123",
+        "produtos": {
+            "mesa de centro": {
+                "imagem": "produto1.jpg",
+                "discrição": "mesa para colocar no centro",
+                "preco": 31.50,
+                "quantidadeEstoque": 5
+            }
+        }
     },
     {
-        "nome": "luiz@luiz.com",
+        "email": "luiz@luiz.com",
         "senha": "123"
     }
 ]

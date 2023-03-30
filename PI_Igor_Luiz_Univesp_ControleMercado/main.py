@@ -8,12 +8,23 @@ from email.mime.multipart import MIMEMultipart
 
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = "IGORKEVEN-M-S"
 
 
 # acesso a pagina inicial
 @app.route("/")
 def index():
-    return render_template("html/home.html")
+        with open('artesao.json') as TodosArtesao:  # abertura do arquivo JSON
+            listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
+
+            for artesao in listaArtesao:  # loop para separar os dados 
+                
+                    
+
+                return render_template('html/home.html',artesao=artesao)
+
+
+    
 
 
 # acesso a pagina produtos
@@ -61,14 +72,14 @@ def acessoArtesao():
     email = request.form.get('emailArtesao') # pegando o email do formulario
     senha = request.form.get('senhaArtesao') # pegando a senha do formulario
 
-
+    session['nomeUsuarioLogado'] = email
     with open('artesao.json') as artesao:  # abertura do arquivo JSON
         listaArtesao = json.load(artesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
 
         for artesao in listaArtesao:  # loop para separar os dados 
 
             if email == artesao['email'] and senha == artesao['senha']:#verificação se os dados escrito pelo usuario são iguais os salvos 
-                return render_template('html/artesao.html')
+                return redirect('/artesao')
             else:
               #  flash('Email ou senha incorretos')
                 return redirect('/loginArtesao')
@@ -128,7 +139,16 @@ def enviarEmail():
 # acesso a pagina do artesão onde ele fara upload dos artesanatos
 @app.route("/artesao")
 def artesao():
-    return render_template('html/artesao.html')
+    email = session['nomeUsuarioLogado'] 
+    with open('artesao.json') as TodosArtesao:  # abertura do arquivo JSON
+        listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
+
+        for artesao in listaArtesao:  # loop para separar os dados 
+            if email == artesao['email']:
+                print(artesao['nome'])
+                nome = artesao['nome']
+
+                return render_template('html/artesao.html',artesao=artesao,nome=nome)
 
 
 

@@ -2,17 +2,36 @@
     {
         "email": "igor@igor.com",
         "senha": "123",
+        "nome":"igor Keven",
+        "id":"1",
+        
         "produtos": {
             "mesa de centro": {
                 "imagem": "produto1.jpg",
                 "discrição": "mesa para colocar no centro",
                 "preco": 31.50,
                 "quantidadeEstoque": 5
+            },
+            "abajur": {
+                "imagem": "produto2.jpg",
+                "discrição": "abajur com lampada que acende",
+                "preco": 10.50,
+                "quantidadeEstoque": 15
+            },
+            "colher": {
+                "imagem": "produto3.jpg",
+                "discrição": "colher para comer alguma coisa",
+                "preco": 315,
+                "quantidadeEstoque": 2
             }
+
+
         }
     },
     {
         "email": "luiz@luiz.com",
-        "senha": "123"
+        "senha": "123",
+        "nome":"luiz",
+        "id":"2"
     }
 ]

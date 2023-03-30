@@ -10,31 +10,48 @@ main{
 
 .perfil {
     position: fixed;
-    top: 10;
-    left: 0;
+    top: 10%;
+    left: 0%;
     width: 15%;
     height: 100%;
     background-color: #007bff;
-    padding: 20px;
+    padding: 10px;
+    text-align: center;
   }
 
   .perfil img:hover {
     cursor: pointer;
   }
   
-
-  #enviar_produtos {
-    width: 50%; /* Defina a largura do formulário */
-    float: right; /* Faça o formulário flutuar à esquerda */
+  .produtos {
+    margin-bottom: 10%;
+    margin-top:10% ;
+    position: relative;
+    float: right;
   }
+
+
+
+  .formulario_produtos {
+    /* flex: 1 0 50px; */
+    margin-right: 20%;
+    margin-left: 20%;
+    margin-top: 10%;
+    float: left; 
+    width: 400px; 
+    position: relative;
+  }
+
+
 
   #enviar_produtos label {
-    display: block;
     margin-bottom: 10px;
     font-weight: bold;
+    display: block;
+
   }
   
-  #enviar_produtos input[type="url"],
+  #enviar_produtos input[type="file"],
   #enviar_produtos input[type="text"],
   #enviar_produtos input[type="number"] {
     display: block;
@@ -44,6 +61,12 @@ main{
     margin-bottom: 20px;
     box-sizing: border-box;
     border: 1px solid #ddd;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #000000;
+    border-radius: 3px;
+    margin-bottom: 10px;
+
   }
   
   form input[type="submit"] {
@@ -53,13 +76,22 @@ main{
     border: none;
     border-radius: 5px;
     cursor: pointer;
+
+  }
+
+
+  .formulario_produtos input[type="submit"]:hover {
+    background-color: #0059b3;
   }
 
 
 
 
+ 
 
 
+
+  /* estilo do enviar foto do perfil */
   .modal {
     position: fixed;
     z-index: 1;
@@ -94,46 +126,4 @@ main{
     color: black;
     text-decoration: none;
     cursor: pointer;
-  }
-
-
-  .conteudo {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  .formulario_produtos {
-    flex: 1 0 400px;
-    margin-right: 20px;
-  }
-  /* Estilos para a lista de produtos */
-
-
-
-  .formulario_produtos {
-    flex: 1 0 400px;
-    margin-right: 20px;
-  }
-  .formulario_produtos label {
-    display: block;
-    margin-bottom: 10px;
-  }
-  .formulario_produtos input[type="file"],
-  .formulario_produtos input[type="text"],
-  .formulario_produtos input[type="number"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    margin-bottom: 10px;
-  }
-  .formulario_produtos input[type="submit"] {
-    background-color: #0066cc;
-    color: #fff;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-  }
-  .formulario_produtos input[type="submit"]:hover {
-    background-color: #0059b3;
   }

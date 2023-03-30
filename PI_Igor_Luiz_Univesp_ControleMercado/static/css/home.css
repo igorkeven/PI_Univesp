@@ -4,7 +4,16 @@
   nav ul {
     list-style: none;
     margin: 0;
-    padding: 0;
+    padding: 10px;
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    height: 30px ;
+    width: 100%;
+    position: fixed;
+
+
+
   }
   
   nav li {
@@ -33,12 +42,13 @@
     margin-bottom: 20px;
   }
 
-  .menu {
+  /* .menu {
     list-style: none;
     margin: 0;
     padding: 0;
-    text-align: right;
-  }
+    position: fixed;
+
+  } */
 
 
   /* estilo e icone do carrinho */
@@ -84,7 +94,7 @@
   }
   
   /* Estilos para os produtos */
-  #produtos {
+  /* #produtos {
     padding: 20px;
   }
   
@@ -131,7 +141,7 @@
   .produto button:hover {
     background-color: #333;
     color: #fff;
-  }
+  } */
   
   /* Estilos para a seção de busca */
   #busca {
@@ -173,13 +183,14 @@ body {
   }
   
   /* Define o estilo do cabeçalho */
-  header {
+  /* header {
     background-color: #333;
     color: white;
     padding: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 30px ;
 
-  }
+  } */
   
   /* Define o estilo do logotipo */
   #logo {
@@ -190,7 +201,7 @@ body {
   
   
   /* Define o estilo dos produtos */
-  .produto {
+  /* .produto {
     background-color: white;
     border: 1px solid #ccc;
     padding: 10px;
@@ -198,18 +209,18 @@ body {
     width: 200px;
     height: 300px;
     float: left;
-  }
+  } */
   
   /* Define o estilo do título do produto */
-  .produto h3 {
+  /* .produto h3 {
     font-size: 18px;
     margin: 0;
-  }
+  } */
   
   /* Define o estilo da descrição do produto */
-  .produto p {
+  /* .produto p {
     font-size: 14px;
-  }
+  } */
   
   /* Define o estilo do botão de adicionar ao carrinho */
   .botao-adicionar {
@@ -244,7 +255,7 @@ body {
     color: white;
     padding: 10px;
     text-align: center;
-    height: 30px; /* altura do rodapé */
+    height: 30px; 
     text-align: center;
     position: fixed;
     bottom: 0;
@@ -264,3 +275,35 @@ body {
     padding: 20px;
   }
    */
+   form input[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+
+  }
+
+
+  form input[type="submit"]:hover {
+    background-color: #0059b3;
+  }
+
+
+
+  .produtos {
+    margin: 0 auto;
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .produto {
+    display: inline-block;
+    width: 25%;
+    margin-bottom: 20px;
+  }
+
+  .produto.ultima {
+    clear: left;
+  }

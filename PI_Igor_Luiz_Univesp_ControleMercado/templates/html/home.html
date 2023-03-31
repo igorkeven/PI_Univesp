@@ -18,7 +18,7 @@
           <li><a href="#">Produtos</a></li>
           <li><a href="/loginArtesao">Perfil do Artesão</a></li>
           <li class="btnlogin"><a href="/login">Login</a></li>
-          <li class="btncadastrar"><a href="#">Cadastrar</a></li>
+          <li class="btncadastrar"><a href="/cadastrar">Cadastrar</a></li>
           <li class="carrinho"><a href="#"> <img src="/static/arquivos/carrinho.png" alt=""><span class="text">Carrinho vazio</span> </a></li>
         </ul>
       </nav>
@@ -39,35 +39,6 @@
           <!-- aqui colocamos os produtos em destaque -->
         </div>
       </section>
-      
-<!--      <section id="produtos">
-        <h2>Todos os Produtos</h2>
-        
-          
-
-          <div class="produtos">
-           
-            {% for produto, dados in artesao['produtos'].items() %}
-              <div class="produto">
-                <img src="{{ url_for('static', filename='produtos/' + dados['imagem']) }}" alt="{{ produto }}" width="200">
-                <h2>{{ produto }}</h2>
-                <p>{{ dados['discrição'] }}</p>
-                <p>Preço: R$ {{ dados['preco'] }}</p>
-                <p>Quantidade em estoque: {{ dados['quantidadeEstoque'] }}</p>
-                <form action="" method="POST">
-                  <input type="hidden" name="produto_id" value="{{ produto }}">
-                  <input type="submit" value="Comprar">
-              </form>
-                <br>
-              </div>
-            {% endfor %}
-          </div>  
-
-          
-
-
-      </section> -->
-      
 
       <section id="produtos">
         <h2>Todos os Produtos</h2>

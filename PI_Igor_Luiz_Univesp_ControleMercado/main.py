@@ -71,7 +71,7 @@ def loginArtesao():
 def acessoArtesao():
     email = request.form.get('emailArtesao') # pegando o email do formulario
     senha = request.form.get('senhaArtesao') # pegando a senha do formulario
-
+    
     session['nomeUsuarioLogado'] = email
     with open('artesao.json') as artesao:  # abertura do arquivo JSON
         listaArtesao = json.load(artesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
@@ -81,7 +81,7 @@ def acessoArtesao():
             if email == artesao['email'] and senha == artesao['senha']:#verificação se os dados escrito pelo usuario são iguais os salvos 
                 return redirect('/artesao')
             else:
-              #  flash('Email ou senha incorretos')
+                flash('Email ou senha incorretos')
                 return redirect('/loginArtesao')
 
 
@@ -147,8 +147,15 @@ def artesao():
             if email == artesao['email']:
                 print(artesao['nome'])
                 nome = artesao['nome']
+                foto = artesao['foto']
 
-                return render_template('html/artesao.html',artesao=artesao,nome=nome)
+                return render_template('html/artesao.html',artesao=artesao,nome=nome,foto=foto)
+
+
+
+@app.route("/cadastrar")
+def cadastrar():
+    return render_template('html/cadastrar.html')
 
 
 

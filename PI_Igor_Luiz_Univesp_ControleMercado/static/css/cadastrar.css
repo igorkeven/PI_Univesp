@@ -7,7 +7,6 @@
 
 
 .titulo{
-  position: fixed;
   margin: 5% 25%;
 }
 
@@ -18,7 +17,7 @@ form {
     border-radius: 5px;
     padding: 20px;
     max-width: 400px;
-    margin: 10% auto;
+    margin: 1% auto;
     margin-top: 10%;
     margin-bottom: 10%;
     box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.3);

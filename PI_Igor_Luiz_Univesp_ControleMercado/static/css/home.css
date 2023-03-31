@@ -1,6 +1,22 @@
+
+
+
+
+
+div#alerta{
+  background: yellow;
+  color: rgb(194, 0, 0);
+  font-size: 30px;
+  font-family: 'Times New Roman', Times, serif;
+
+}
+
+
+
 /* Estilos para o cabeçalho */
 
-  
+
+
   nav ul {
     list-style: none;
     margin: 0;
@@ -30,25 +46,6 @@
   nav a:hover {
     color: #666;
   }
-  
-  /* Estilos para o destaque */
-  #destaque {
-    background-color: #f9f9f9;
-    padding: 20px;
-  }
-  
-  #destaque h1 {
-    font-size: 28px;
-    margin-bottom: 20px;
-  }
-
-  /* .menu {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    position: fixed;
-
-  } */
 
 
   /* estilo e icone do carrinho */
@@ -183,14 +180,9 @@ body {
   }
   
   /* Define o estilo do cabeçalho */
-  /* header {
-    background-color: #333;
-    color: white;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  header {
     height: 30px ;
-
-  } */
+  }
   
   /* Define o estilo do logotipo */
   #logo {
@@ -263,18 +255,6 @@ body {
 
   }
   
-  
-/* estilo do perfil do artesão
-  .perfil {
-    position: fixed;
-    top: 10;
-    left: 0;
-    width: 15%;
-    height: 100%;
-    background-color: #626ae5;
-    padding: 20px;
-  }
-   */
    form input[type="submit"] {
     background-color: #007bff;
     color: #fff;

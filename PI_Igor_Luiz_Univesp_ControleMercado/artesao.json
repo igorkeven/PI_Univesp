@@ -4,6 +4,7 @@
         "senha": "123",
         "nome":"igor Keven",
         "id":"1",
+        "foto":"produto1.jpg",
         
         "produtos": {
             "mesa de centro": {

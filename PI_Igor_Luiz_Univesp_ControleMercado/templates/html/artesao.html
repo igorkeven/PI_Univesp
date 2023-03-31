@@ -37,10 +37,10 @@
         <h1>{{ nome }}</h1>
         {% else %}
         
-          <img src="{{ foto }}" alt="Foto do artesão {{ nome }}" title="Enviar foto" id="foto-artesao">
+          <img src="{{ url_for('static', filename='fotoPerfil/' + foto) }}" width="200" alt="Foto do artesão {{ nome }}" title="Enviar foto" id="foto-artesao">
        
         <br>
-        <h1>{{ nome }} nome</h1>
+        <h1>{{ nome }} </h1>
         {% endif %}
         <h3><a href="#">Configurações</a></h3>
       </aside>
@@ -78,7 +78,7 @@
               <p>Quantidade em estoque: {{ dados['quantidadeEstoque'] }}</p>
               <form action="" method="POST">
                 <input type="hidden" name="produto_id" value="{{ produto }}">
-                <input type="submit" value="Comprar">
+                <input type="submit" value="Editar">
             </form>
               <br>
             </div>

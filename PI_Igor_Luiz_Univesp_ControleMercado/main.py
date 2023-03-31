@@ -42,8 +42,8 @@ def login():
 # validação de login para liberar acesso ao cliente
 @app.route("/acessoCliente", methods=['POST'])
 def acessoCliente():
-    email = request.form.get('') # pegando o email do formulario
-    senha = request.form.get('') # pegando a senha do formulario
+    email = request.form.get('EmailCliente') # pegando o email do formulario
+    senha = request.form.get('SenhaCliente') # pegando a senha do formulario
 
 
     with open('clientes.json') as clientes:  # abertura do arquivo JSON
@@ -153,4 +153,4 @@ def artesao():
 
 
 if __name__ in '__main__':
-    app.run( debug=True )
+    app.run( debug=True,port=5005 )

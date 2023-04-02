@@ -69,6 +69,7 @@
 
         <div class="produtos">
           <h1>Seus produtos</h1>
+          {% if artesao['produtos'] %}
           {% for produto, dados in artesao['produtos'].items() %}
             <div class="produto">
               <img src="{{ url_for('static', filename='produtos/' + dados['imagem']) }}" alt="{{ produto }}" width="200">
@@ -83,6 +84,7 @@
               <br>
             </div>
           {% endfor %}
+          {% endif %}
         </div>
               
       
@@ -99,8 +101,10 @@ document.getElementById("foto-artesao").addEventListener("click", function() {
   modal.innerHTML = `
     <div class="modal-content">
       <span class="close">&times;</span>
-      <form action="upload.php" method="post" enctype="multipart/form-data">
+      <form action="/enviar_foto" method="post" enctype="multipart/form-data">
         <input type="file" name="foto" id="foto">
+        <input type="hidden" name="nomeFoto" value="{{artesao}}" >
+        
         <input type="submit" value="Enviar">
       </form>
     </div>

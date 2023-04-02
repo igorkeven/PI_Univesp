@@ -17,11 +17,11 @@ def index():
         with open('artesao.json') as TodosArtesao:  # abertura do arquivo JSON
             listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
 
-            for artesao in listaArtesao:  # loop para separar os dados 
-                
+            
+            
                     
 
-                return render_template('html/home.html',artesao=artesao)
+        return render_template('html/home.html',artesao=listaArtesao)
 
 
     
@@ -71,16 +71,17 @@ def loginArtesao():
 def acessoArtesao():
     email = request.form.get('emailArtesao') # pegando o email do formulario
     senha = request.form.get('senhaArtesao') # pegando a senha do formulario
-    
+    print(email)
     session['nomeUsuarioLogado'] = email
     with open('artesao.json') as artesao:  # abertura do arquivo JSON
         listaArtesao = json.load(artesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
-
+        cont = 0
         for artesao in listaArtesao:  # loop para separar os dados 
-
+            cont +=1
+            print(artesao['email'])
             if email == artesao['email'] and senha == artesao['senha']:#verificação se os dados escrito pelo usuario são iguais os salvos 
                 return redirect('/artesao')
-            else:
+            if cont >= len(listaArtesao):
                 flash('Email ou senha incorretos')
                 return redirect('/loginArtesao')
 
@@ -145,11 +146,29 @@ def artesao():
 
         for artesao in listaArtesao:  # loop para separar os dados 
             if email == artesao['email']:
-                print(artesao['nome'])
+                
                 nome = artesao['nome']
                 foto = artesao['foto']
 
                 return render_template('html/artesao.html',artesao=artesao,nome=nome,foto=foto)
+
+
+# rota e função para envio de foto de perfil
+#
+# precisa terminar
+#
+
+@app.route('/enviar_foto', methods=['POST'])
+def enviar_foto():
+    foto = request.files.get('foto')
+    nome = request.form.get('nomeFoto')
+    print(nome)
+    nome_arquivo = f"nome_{nome['nome']}_id_{nome['id']}"
+    #foto.save(os.path.join('static/fotoPerfil', nome_arquivo))
+    
+    
+    
+    return redirect('/artesao')
 
 
 
@@ -160,4 +179,4 @@ def cadastrar():
 
 
 if __name__ in '__main__':
-    app.run( debug=True,port=5005 )
+    app.run( debug=True )

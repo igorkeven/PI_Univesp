@@ -43,19 +43,23 @@
       <section id="produtos">
         <h2>Todos os Produtos</h2>
         <div class="produtos">
-          {% for produto, dados in artesao['produtos'].items() %}
+          {% for artesao1 in artesao %}
+          {% if artesao1['produtos'] %}
+          {% for produto, dados in artesao1['produtos'].items() %}
           <div class="produto{% if loop.index % 4 == 0 %} ultima{% endif %}">
             <img src="{{ url_for('static', filename='produtos/' + dados['imagem']) }}" alt="{{ produto }}" width="200">
             <h2>{{ produto }}</h2>
             <p>{{ dados['discrição'] }}</p>
             <p>Preço: R$ {{ dados['preco'] }}</p>
-            <p>Quantidade em estoque: {{ dados['quantidadeEstoque'] }}</p>
+            <p>vendedor: {{ artesao1['nome'] }}</p>
             <form action="" method="POST">
               <input type="hidden" name="produto_id" value="{{ produto }}">
-              <input type="submit" value="Comprar">
+              <input type="submit" value="Adicionar ao carrinho">
             </form>
             <br>
           </div>
+          {% endfor %}
+          {% endif %}
           {% endfor %}
         </div>
       </section>

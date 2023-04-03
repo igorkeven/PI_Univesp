@@ -2,47 +2,58 @@
     {
         "email": "igor@igor.com",
         "senha": "123",
-        "nome":"igor Keven",
-        "id":"1",
-        "foto":"produto1.jpg",
-        
+        "nome": "igor Keven",
+        "chavePIX": "123456789",
+        "id": 1,
+        "foto": "produto1.jpg",
         "produtos": {
             "mesa de centro": {
                 "imagem": "produto1.jpg",
-                "discrição": "mesa para colocar no centro",
-                "preco": 31.50
+                "discri\u00c3\u00a7\u00c3\u00a3o": "mesa para colocar no centro",
+                "preco": 31.5
             },
             "abajur": {
                 "imagem": "produto2.jpg",
-                "discrição": "abajur com lampada que acende",
-                "preco": 10.50
-                
+                "discri\u00c3\u00a7\u00c3\u00a3o": "abajur com lampada que acende",
+                "preco": 10.5
             },
             "colher": {
                 "imagem": "produto3.jpg",
-                "discrição": "colher para comer alguma coisa",
+                "discri\u00c3\u00a7\u00c3\u00a3o": "colher para comer alguma coisa",
                 "preco": 315
-                
             }
-
-
         }
     },
     {
         "email": "luiz@luiz.com",
         "senha": "123",
-        "nome":"luiz",
-        "id":"2",
-        "foto":"produto1.jpg"
-        
-
+        "nome": "luiz",
+        "chavePIX": "123456789",
+        "id": 2,
+        "foto": "fotoPerfil_luiz_id_2.png"
     },
     {
         "email": "joao@joao.com",
         "senha": "123",
-        "nome":"joao Keven",
-        "id":"3",
-        "foto":"produto1.jpg"
+        "nome": "joao Keven",
+        "chavePIX": "123456789",
+        "id": 3,
+        "foto": "produto1.jpg"
+    },
+    {
+        "email": "teste@teste.com",
+        "senha": "123",
+        "nome": "teste 1",
+        "chavePIX": "123456",
+        "id": 4,
+        "foto": ""
+    },
+    {
+        "email": "teste2@teste.com",
+        "senha": "123",
+        "nome": "teste 2",
+        "chavePIX": "123456",
+        "id": 5,
+        "foto": ""
     }
-
 ]

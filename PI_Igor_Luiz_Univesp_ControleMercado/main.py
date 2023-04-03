@@ -1,10 +1,12 @@
 
 
-from flask import Flask, render_template,request,redirect,flash,session
+from flask import Flask, render_template,request,redirect,flash,session, url_for
 import json
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import os
+from werkzeug.utils import secure_filename
 
 
 app = Flask(__name__)
@@ -154,27 +156,72 @@ def artesao():
 
 
 # rota e função para envio de foto de perfil
-#
-# precisa terminar
-#
-
 @app.route('/enviar_foto', methods=['POST'])
 def enviar_foto():
     foto = request.files.get('foto')
-    nome = request.form.get('nomeFoto')
-    print(nome)
-    nome_arquivo = f"nome_{nome['nome']}_id_{nome['id']}"
-    #foto.save(os.path.join('static/fotoPerfil', nome_arquivo))
+    dadosUsuario_str = request.form.get('dadosUsuario')
+    # substitui as aspas simples por aspas duplas
+    dadosUsuario_str = dadosUsuario_str.replace("'", "\"")
+    dadosUsuario = json.loads(dadosUsuario_str)
+    nome_arquivo = f"fotoPerfil_{dadosUsuario['nome']}_id_{dadosUsuario['id']}"
+    nome_arquivo = secure_filename(nome_arquivo) # obtém a extensão do arquivo carregado e adiciona ao nome do arquivo
+    nome_arquivo = f"{nome_arquivo}.{foto.filename.split('.')[-1]}"
+    foto.save(os.path.join('static/fotoPerfil', nome_arquivo))
     
-    
-    
-    return redirect('/artesao')
+    cont = 0
+    with open('artesao.json') as TodosArtesao:  # abertura do arquivo JSON
+        listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
+
+        for artesao in listaArtesao:  # loop para separar os dados 
+            cont +=1
+            if dadosUsuario['email'] == artesao['email']:
+                artesao['foto'] = nome_arquivo # atualiza o nome do arquivo no dicionário correspondente
+                with open('artesao.json', 'w') as TodosArtesao:  # abre o arquivo JSON em modo de escrita
+                    json.dump(listaArtesao, TodosArtesao, indent=4) # escreve a lista atualizada de volta no arquivo JSON
+                return redirect('/artesao')
 
 
 
+# rota que renderiza a pagina de cadastro
 @app.route("/cadastrar")
 def cadastrar():
+
     return render_template('html/cadastrar.html')
+
+
+#rota para cadastrar artesao
+@app.route("/cadastrarArtesao", methods=['POST'])
+def cadastrarArtesao():
+    # pegando os dados que o usuario digitou no formulario de cadastro de artesão
+    email = request.form.get('emailArtesaoCadastro')
+    senha = request.form.get('senhaArtesaoCadastro')
+    nome = request.form.get('nomeCadastroartesao')
+    chavepix = request.form.get('chavePIX')
+    id = 0 # definindo um valor iniciar para o ID
+    with open('artesao.json') as artesao_json: # abrindo o arquivo onde tem todos os usuarios ja cadastrados
+        listaArtesao = json.load(artesao_json)# colocando todo arquivo dentro da variavel
+    for artesao in listaArtesao: # fazend o laço em todos os usuarios salvos
+        id = artesao['id'] +1 # pegando o ultimo ID e adicionando 1 para o novo ID
+        if email == artesao['email']:# verificando se o novo usuario ja não esta cadastrado atravez do email
+            flash('opa parece que esse email ja esta cadastrado, se caso tenha esquecido a senha click em esqueci minha senha!')
+            return redirect('/cadastrar')# se ja tiver um email cadastrado ele redireciona e da essa menssagem
+# criando um novo  usuario com os dados obitidos do formulario html
+    user = [    
+        {
+        "email": email,
+        "senha": senha,
+        "nome": nome,
+        "chavePIX": chavepix,
+        "id": id ,
+        "foto": ""}] # a foto de perfil sempre inicia vazia, depois o usuario pode adicionar uma...
+    novaListaArtesao = listaArtesao + user # concatenando todos usuarios ja salvos com o novo e colocando em uma variavel
+    with open('artesao.json', 'w') as artesao_json:# abrindo o arquivo JSON em mode de escrita(para edições)
+        json.dump(novaListaArtesao,artesao_json, indent=4 )# salvando todos incluindo o novo usuario no arquivo JSON
+    flash('Usuario cadastrado com sucesso!! BOAS VENDAS !!')
+    return redirect('/loginArtesao') # redireciona para o login junto com a menssagem flash
+
+
+
 
 
 

@@ -37,12 +37,13 @@
         <h1>{{ nome }}</h1>
         {% else %}
         
-          <img src="{{ url_for('static', filename='fotoPerfil/' + foto) }}" width="200" alt="Foto do artesão {{ nome }}" title="Enviar foto" id="foto-artesao">
+          <img src="{{ url_for('static', filename='fotoPerfil/' + foto) }}" width="200" height="200" alt="Foto do artesão {{ nome }}" title="Mudar foto" id="foto-artesao">
        
         <br>
         <h1>{{ nome }} </h1>
         {% endif %}
-        <h3><a href="#">Configurações</a></h3>
+        <h3><a href="#">Mudar senha</a></h3>
+        <h3><a href="#">Apagar minha conta</a></h3>
       </aside>
       
 
@@ -95,7 +96,19 @@
     </footer>
 <script>
   
+
 document.getElementById("foto-artesao").addEventListener("click", function() {
+  if (this.src.includes("usuario.png")) {
+    // Usuário ainda não tem uma imagem definida, permitir a mudança da imagem sem alerta
+  } else {
+    // Usuário já tem uma imagem definida, solicitar confirmação antes de permitir a mudança da imagem
+    if (confirm("Você tem certeza que deseja mudar sua foto?")) {
+      // Usuário confirmou a mudança da foto
+    } else {
+      // Usuário cancelou a mudança da foto
+      return;
+    }
+  }
   var modal = document.createElement("div");
   modal.classList.add("modal");
   modal.innerHTML = `
@@ -103,7 +116,7 @@ document.getElementById("foto-artesao").addEventListener("click", function() {
       <span class="close">&times;</span>
       <form action="/enviar_foto" method="post" enctype="multipart/form-data">
         <input type="file" name="foto" id="foto">
-        <input type="hidden" name="nomeFoto" value="{{artesao}}" >
+        <input type="hidden" name="dadosUsuario" value="{{artesao}}" >
         
         <input type="submit" value="Enviar">
       </form>
@@ -116,7 +129,6 @@ document.getElementById("foto-artesao").addEventListener("click", function() {
     modal.remove();
   });
 });
-
 
     
 </script>

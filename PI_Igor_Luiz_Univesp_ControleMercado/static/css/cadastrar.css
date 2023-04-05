@@ -52,6 +52,7 @@
     width: 100%;
     box-sizing: border-box;
     border: 2px solid #ccc;
+    
   }
   
   input[type="submit"] {
@@ -126,3 +127,19 @@
   #tipoCadastro button:hover {
     background-color: #3e8e41;
   }
+
+
+
+
+
+  #artesaoCadastro, #clienteCadastro, #tituloArtesao, #tituloCliente {
+    display: none;
+  }
+
+  #mensagemErro , #mensagemErrocliente{
+    display: none;
+    color: red;
+    
+  }
+
+

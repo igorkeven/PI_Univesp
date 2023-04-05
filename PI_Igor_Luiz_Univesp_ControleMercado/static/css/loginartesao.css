@@ -68,10 +68,3 @@ form {
   
 
 
-/* estilo do botão de cadastro */
-  .cadastrar {
-    position: absolute; 
-    top: 5;
-    right: 0;
-    margin-right: 7%;
-  }

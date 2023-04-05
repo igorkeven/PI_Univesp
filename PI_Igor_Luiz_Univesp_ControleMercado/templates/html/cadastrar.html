@@ -10,14 +10,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cadastrar.css') }}">
     <style>
       /* Esconde os formulários de cadastro inicialmente */
-      #artesaoCadastro, #clienteCadastro, #tituloArtesao, #tituloCliente {
-        display: none;
-      }
-
-      #mensagemErro{
-        display: none;
-        color: red;
-      }
+      
     </style>
   </head>
   <body>
@@ -25,7 +18,7 @@
       <nav>
         <ul>
           <li><a href="/">Página Inicial</a></li>
-          <li><a href="/loginArtesao">Perfil do Artesão</a></li>
+          <li><a href="/artesao">Perfil do Artesão</a></li>
         </ul>
       </nav>
           </header>
@@ -75,8 +68,9 @@
           </form>
 
 
-          <form id="clienteCadastro" action="" method="post">
+          <form id="clienteCadastro" action="/cadastrarCliente" method="post">
             <h1>Cadastrar cliente </h1>
+            <p id="mensagemErrocliente" >As senhas não são iguais!</p>
             <label for="emailClienteCadastro">Email</label>
             <input type="email" name="emailClienteCadastro" id="emailClienteCadastro" placeholder="Digite seu Email" required>
             <label for="nomeCadastroartesao">Nome</label>
@@ -129,16 +123,42 @@ document.getElementById("artesaoCadastro").addEventListener("submit", function(e
         mensagemErro.style.display = "block";
         document.getElementById("senhaArtesaoCadastro").classList.add("erro");
         document.getElementById("repetirsenhaArtesao").classList.add("erro");
+        document.getElementById('repetirsenhaArtesao').style.background = 'red'
         return false;
     } else {
         mensagemErro.style.display = "none";
         document.getElementById("senhaArtesaoCadastro").classList.remove("erro");
         document.getElementById("repetirsenhaArtesao").classList.remove("erro");
+        document.getElementById('repetirsenhaArtesao').style.background = 'white'
         document.getElementById("artesaoCadastro").submit(); 
         return true;
     }
 });
 
+
+
+document.getElementById("clienteCadastro").addEventListener("submit", function(event) {
+    event.preventDefault();
+    let senha = document.getElementById("senhaClienteCadastro").value;
+    let repetirSenha = document.getElementById("repetirsenhacliente").value;
+    let mensagemErrocliente = document.getElementById("mensagemErrocliente");
+
+    if (senha !== repetirSenha) {
+      mensagemErrocliente.style.display = "block";
+        document.getElementById("senhaClienteCadastro").classList.add("erro");
+        document.getElementById("repetirsenhacliente").classList.add("erro");
+        document.getElementById('repetirsenhacliente').style.background = 'red'
+
+        return false;
+    } else {
+      mensagemErrocliente.style.display = "none";
+        document.getElementById("senhaClienteCadastro").classList.remove("erro");
+        document.getElementById("repetirsenhacliente").classList.remove("erro");
+        document.getElementById('repetirsenhacliente').style.background = 'white'
+        document.getElementById("clienteCadastro").submit(); 
+        return true;
+    }
+});
 
 
 

@@ -55,5 +55,13 @@
         "chavePIX": "123456",
         "id": 5,
         "foto": ""
+    },
+    {
+        "email": "teste3@teste.com",
+        "senha": "123",
+        "nome": "teste 3",
+        "chavePIX": "123",
+        "id": 6,
+        "foto": ""
     }
 ]

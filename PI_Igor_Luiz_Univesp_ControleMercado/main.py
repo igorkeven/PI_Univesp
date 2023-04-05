@@ -13,6 +13,17 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = "IGORKEVEN-M-S"
 
 
+# rota para fazer logout
+@app.route('/sair')
+def logout():
+    session.clear() # Limpa a sessão
+    return redirect('loginArtesao') # Redireciona para a página de login
+
+
+
+
+
+
 # acesso a pagina inicial
 @app.route("/")
 def index():
@@ -29,10 +40,6 @@ def index():
     
 
 
-# acesso a pagina produtos
-@app.route("/produtos")
-def produtos():
-    return render_template('html/produtos.html')
 
 
 # acesso a pagina de login do cliente para liberar as compras
@@ -58,6 +65,28 @@ def acessoCliente():
             else:
                # flash('Email ou senha incorretos')
                 return redirect('/login')
+
+
+
+
+
+# acesso a pagina do artesão onde ele fara upload dos artesanatos
+@app.route('/artesao')
+def artesao():
+    if 'nomeUsuarioLogado' in session: # Verifica se a chave 'nomeUsuarioLogado' está presente na sessão
+        email = session['nomeUsuarioLogado'] 
+        with open('artesao.json') as TodosArtesao:  # abertura do arquivo JSON
+            listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
+
+            for artesao in listaArtesao:  # loop para separar os dados 
+                if email == artesao['email']:
+                    nome = artesao['nome']
+                    foto = artesao['foto']
+                    return render_template('html/artesao.html',artesao=artesao,nome=nome,foto=foto)
+    else:
+        # Usuário não está logado, redireciona para a página de login
+        return redirect('/loginArtesao')
+
 
 
 
@@ -139,21 +168,6 @@ def enviarEmail():
     
 
 
-# acesso a pagina do artesão onde ele fara upload dos artesanatos
-@app.route("/artesao")
-def artesao():
-    email = session['nomeUsuarioLogado'] 
-    with open('artesao.json') as TodosArtesao:  # abertura do arquivo JSON
-        listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
-
-        for artesao in listaArtesao:  # loop para separar os dados 
-            if email == artesao['email']:
-                
-                nome = artesao['nome']
-                foto = artesao['foto']
-
-                return render_template('html/artesao.html',artesao=artesao,nome=nome,foto=foto)
-
 
 # rota e função para envio de foto de perfil
 @app.route('/enviar_foto', methods=['POST'])
@@ -219,6 +233,38 @@ def cadastrarArtesao():
         json.dump(novaListaArtesao,artesao_json, indent=4 )# salvando todos incluindo o novo usuario no arquivo JSON
     flash('Usuario cadastrado com sucesso!! BOAS VENDAS !!')
     return redirect('/loginArtesao') # redireciona para o login junto com a menssagem flash
+
+
+
+
+#rota para cadastrar cliente
+@app.route("/cadastrarCliente", methods=['POST'])
+def cadastrarCliente():
+    # pegando os dados que o usuario digitou no formulario de cadastro 
+    email = request.form.get('emailClienteCadastro')
+    senha = request.form.get('senhaClienteCadastro')
+    nome = request.form.get('nomeCadastroCliente')
+    id = 0 # definindo um valor iniciar para o ID
+    with open('clientes.json') as cliente_json: # abrindo o arquivo onde tem todos os usuarios ja cadastrados
+        listaCliente = json.load(cliente_json)# colocando todo arquivo dentro da variavel
+    for cliente in listaCliente: # fazend o laço em todos os usuarios salvos
+        id = cliente['id'] +1 # pegando o ultimo ID e adicionando 1 para o novo ID
+        if email == cliente['email']:# verificando se o novo usuario ja não esta cadastrado atravez do email
+            flash('opa parece que esse email ja esta cadastrado, se caso tenha esquecido a senha click em esqueci minha senha!')
+            return redirect('/cadastrar')# se ja tiver um email cadastrado ele redireciona e da essa menssagem
+# criando um novo  usuario com os dados obitidos do formulario html
+    user = [    
+        {
+        "nome": nome,
+        "email": email,
+        "senha": senha,
+        "id": id ,
+        "foto": ""}] # a foto de perfil sempre inicia vazia, depois o usuario pode adicionar uma...
+    novaListaCliente = listaCliente + user # concatenando todos usuarios ja salvos com o novo e colocando em uma variavel
+    with open('clientes.json', 'w') as cliente_json:# abrindo o arquivo JSON em mode de escrita(para edições)
+        json.dump(novaListaCliente,cliente_json, indent=4 )# salvando todos incluindo o novo usuario no arquivo JSON
+    flash('Usuario cadastrado com sucesso!! BOAS VENDAS !!')
+    return redirect('/login') # redireciona para o login junto com a menssagem flash
 
 
 

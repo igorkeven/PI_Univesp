@@ -90,55 +90,6 @@ div#alerta{
     display: inline-block;
   }
   
-  /* Estilos para os produtos */
-  /* #produtos {
-    padding: 20px;
-  }
-  
-  #produtos h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  
-  .produtos {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  
-  .produto {
-    width: 30%;
-    margin-right: 3%;
-    margin-bottom: 20px;
-  }
-  
-  .produto img {
-    width: 100%;
-  }
-  
-  .produto h3 {
-    font-size: 18px;
-    margin-bottom: 10px;
-  }
-  
-  .produto p {
-    font-size: 16px;
-    color: #999;
-    margin-bottom: 10px;
-  }
-  
-  .produto button {
-    background-color: #f9f9f9;
-    border: none;
-    padding: 10px;
-    font-size: 16px;
-    color: #333;
-    cursor: pointer;
-  }
-  
-  .produto button:hover {
-    background-color: #333;
-    color: #fff;
-  } */
   
   /* Estilos para a seção de busca */
   #busca {
@@ -191,28 +142,6 @@ body {
     margin: 0;
   }
   
-  
-  /* Define o estilo dos produtos */
-  /* .produto {
-    background-color: white;
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin: 10px;
-    width: 200px;
-    height: 300px;
-    float: left;
-  } */
-  
-  /* Define o estilo do título do produto */
-  /* .produto h3 {
-    font-size: 18px;
-    margin: 0;
-  } */
-  
-  /* Define o estilo da descrição do produto */
-  /* .produto p {
-    font-size: 14px;
-  } */
   
   /* Define o estilo do botão de adicionar ao carrinho */
   .botao-adicionar {
@@ -286,4 +215,14 @@ body {
 
   .produto.ultima {
     clear: left;
+  }
+
+
+
+  /* estilo do botão de cadastro */
+  .cadastrar {
+    position: absolute; 
+    top: 5;
+    right: 0;
+    margin-right: 7%;
   }

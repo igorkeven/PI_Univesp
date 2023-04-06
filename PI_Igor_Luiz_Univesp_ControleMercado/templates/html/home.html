@@ -16,9 +16,13 @@
         <ul>
           <li><a href="/">Página Inicial</a></li>
           <li><a href="/artesao">Perfil do Artesão</a></li>
+          {% if logado %}
+          <li class="btnlogin"><a href="#">Minha pagina</a></li>
+          {% else %}
           <li class="btnlogin"><a href="/login">Login</a></li>
           <li class="btncadastrar"><a href="/cadastrar">Cadastrar</a></li>
-          <li class="carrinho"><a href="#"> <img src="/static/arquivos/carrinho.png" alt=""><span class="text">Carrinho vazio</span> </a></li>
+          {% endif %}
+          <li class="carrinho"><a href="{{rotaCarrinho}}"> <img src="/static/arquivos/carrinho.png" alt=""><span class="text">{{carrinho}}</span> </a></li>
         </ul>
       </nav>
           </header>
@@ -48,12 +52,21 @@
           <div class="produto{% if loop.index % 4 == 0 %} ultima{% endif %}">
             <img src="{{ url_for('static', filename='produtos/' + dados['imagem']) }}" alt="{{ produto }}" width="200">
             <h2>{{ produto }}</h2>
-            <p>{{ dados['discrição'] }}</p>
+            <p>{{ dados['discricao'] }}</p>
             <p>Preço: R$ {{ dados['preco'] }}</p>
             <p>vendedor: {{ artesao1['nome'] }}</p>
-            <form action="" method="POST">
-              <input type="hidden" name="produto_id" value="{{ produto }}">
-              <input type="submit" value="Adicionar ao carrinho">
+           {{artesao1['id']}}
+            
+            <form action="{{rotaCompra}}" method="{% if rotaCompra == '/adicionarCarrinho' %}POST{% else %}GET{% endif %}">
+              {% if rotaCompra == '/adicionarCarrinho' %}
+              <input type="hidden" name="imagem" value="{{ dados['imagem'] }}">
+              <input type="hidden" name="discricao" value="{{ dados['discricao'] }}">
+              <input type="hidden" name="preco" value="{{ dados['preco'] }}">
+              <input type="hidden" name="nome_produto" value="{{produto}}">
+              <input type="hidden" name="id_vendedor" value="{{artesao1['id']}}">
+
+              {% endif %}
+              <input type="submit" value="{{btnCompra}}">
             </form>
             <br>
           </div>

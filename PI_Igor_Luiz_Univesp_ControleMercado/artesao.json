@@ -9,17 +9,17 @@
         "produtos": {
             "mesa de centro": {
                 "imagem": "produto1.jpg",
-                "discri\u00c3\u00a7\u00c3\u00a3o": "mesa para colocar no centro",
+                "discricao": "mesa para colocar no centro",
                 "preco": 31.5
             },
             "abajur": {
                 "imagem": "produto2.jpg",
-                "discri\u00c3\u00a7\u00c3\u00a3o": "abajur com lampada que acende",
+                "discricao": "abajur com lampada que acende",
                 "preco": 10.5
             },
             "colher": {
                 "imagem": "produto3.jpg",
-                "discri\u00c3\u00a7\u00c3\u00a3o": "colher para comer alguma coisa",
+                "discricao": "colher para comer alguma coisa",
                 "preco": 315
             }
         }

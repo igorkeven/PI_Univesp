@@ -1,17 +1,37 @@
 [
     {
-        "nome":"igor keven",
+        "nome": "igor keven",
         "email": "igor@igor.com",
         "senha": "123",
-        "id":"1",
-        "foto":""
+        "id": 1,
+        "foto": "",
+        "carrinho": {
+            "mesa de centro": {
+                "imagem": "produto1.jpg",
+                "discricao": "mesa para colocar no centro",
+                "preco": 31.5,
+                "id_vendedor": 1
+            },
+            "abajur": {
+                "imagem": "produto2.jpg",
+                "descricao": "abajur com lampada que acende",
+                "preco": 10.5,
+                "id_vendedor": 1
+            },
+            "colher": {
+                "imagem": "produto3.jpg",
+                "descricao": "colher para comer alguma coisa",
+                "preco": 315.0,
+                "id_vendedor": 1
+            }
+        },
+        "total_preco": 357.0
     },
     {
-    
-        "nome":"Luiz Eduardo",
+        "nome": "Luiz Eduardo",
         "email": "luiz@luiz.com",
         "senha": "123",
-        "id":"2",
-        "foto":""
+        "id": 2,
+        "foto": ""
     }
 ]

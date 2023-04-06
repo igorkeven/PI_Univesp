@@ -17,7 +17,7 @@ app.config['SECRET_KEY'] = "IGORKEVEN-M-S"
 @app.route('/sair')
 def logout():
     session.clear() # Limpa a sessão
-    return redirect('loginArtesao') # Redireciona para a página de login
+    return redirect('/') # Redireciona para a página inicial
 
 
 
@@ -27,18 +27,64 @@ def logout():
 # acesso a pagina inicial
 @app.route("/")
 def index():
-        with open('artesao.json') as TodosArtesao:  # abertura do arquivo JSON
-            listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
+    with open('artesao.json') as TodosArtesao:  # abertura do arquivo JSON
+        listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
+    if 'clienteLogado' in session:
+        carrinho = 'click para ver seu carrinho'
+        rotaCarrinho = '/carrinho'
+        btnCompra = 'Adicionar no Carrinho'
+        rotaCompra = '/adicionarCarrinho'
+        logado = True
+    else:
+        carrinho = 'Faça Login'
+        rotaCarrinho = '/login'
+        btnCompra = 'Faça login para comprar'
+        rotaCompra = '/login'
+        logado = False
 
-            
-            
-                    
-
-        return render_template('html/home.html',artesao=listaArtesao)
+    return render_template('html/home.html',artesao=listaArtesao,carrinho=carrinho,rotaCarrinho=rotaCarrinho,btnCompra=btnCompra,rotaCompra=rotaCompra,logado=logado)
 
 
-    
+@app.route('/adicionarCarrinho', methods=['POST'])
+def adicionarCarrinho():
+    imagem = request.form.get('imagem')
+    discricao = request.form.get('discricao')
+    preco = float(request.form.get('preco'))
+    nome_produto = request.form.get('nome_produto')
+    id_vendedor = int(request.form.get('id_vendedor'))
+    with open('clientes.json') as f:
+        usuarios = json.load(f)
+    # Encontrar o usuário correto pelo seu ID
+    for usuario in usuarios:
+        if usuario['id'] == id_vendedor:
+            # Adicionar o novo produto ao carrinho do usuário
+            usuario['carrinho'][nome_produto] = {
+                'imagem': imagem,
+                'descricao': discricao,
+                'preco': preco,
+                'id_vendedor': id_vendedor
+            }
+            # Somar os preços dos produtos no carrinho do usuário
+            total_preco = sum([produto['preco'] for produto in usuario['carrinho'].values()])
+            usuario['total_preco'] = total_preco
+            # Salvar o conteúdo atualizado de volta no arquivo JSON
+            with open('clientes.json', 'w') as f:
+                json.dump(usuarios, f, indent=4)
+            break  # sair do loop depois de encontrar o usuário correto
 
+    return redirect('/')
+
+
+
+
+@app.route('/carrinho')
+def carrinho():
+    if 'clienteLogado' in session:
+        email = session['clienteLogado']
+
+        return render_template('html/cliente.html')
+    else:
+        return redirect('/login')
 
 
 
@@ -54,14 +100,14 @@ def acessoCliente():
     email = request.form.get('EmailCliente') # pegando o email do formulario
     senha = request.form.get('SenhaCliente') # pegando a senha do formulario
 
-
+    session['clienteLogado'] = email
     with open('clientes.json') as clientes:  # abertura do arquivo JSON
         listaCliente = json.load(clientes) # colocando os dados do arquivo JSON dentro da variavel 
 
         for cliente in listaCliente:  # loop para separar os dados 
 
-            if email == cliente['nome'] and senha == cliente['senha']:#verificação se os dados escrito pelo usuario são iguais os salvos 
-                return render_template('html/cliente.html')
+            if email == cliente['email'] and senha == cliente['senha']:#verificação se os dados escrito pelo usuario são iguais os salvos 
+                return redirect('/carrinho')
             else:
                # flash('Email ou senha incorretos')
                 return redirect('/login')
@@ -102,7 +148,6 @@ def loginArtesao():
 def acessoArtesao():
     email = request.form.get('emailArtesao') # pegando o email do formulario
     senha = request.form.get('senhaArtesao') # pegando a senha do formulario
-    print(email)
     session['nomeUsuarioLogado'] = email
     with open('artesao.json') as artesao:  # abertura do arquivo JSON
         listaArtesao = json.load(artesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao

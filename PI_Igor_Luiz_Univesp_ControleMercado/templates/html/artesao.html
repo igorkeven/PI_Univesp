@@ -117,6 +117,7 @@ document.getElementById("foto-artesao").addEventListener("click", function() {
       <form action="/enviar_foto" method="post" enctype="multipart/form-data">
         <input type="file" name="foto" id="foto">
         <input type="hidden" name="dadosUsuario" value="{{artesao}}" >
+        <input type="hidden" name="retornoRota" value="/artesao" >
         
         <input type="submit" value="Enviar">
       </form>

@@ -27,6 +27,9 @@ def logout():
 # acesso a pagina inicial
 @app.route("/")
 def index():
+    with open('clientes.json') as f:
+        usuarios = json.load(f)
+
     with open('artesao.json') as TodosArtesao:  # abertura do arquivo JSON
         listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
     if 'clienteLogado' in session:
@@ -42,7 +45,7 @@ def index():
         rotaCompra = '/login'
         logado = False
 
-    return render_template('html/home.html',artesao=listaArtesao,carrinho=carrinho,rotaCarrinho=rotaCarrinho,btnCompra=btnCompra,rotaCompra=rotaCompra,logado=logado)
+    return render_template('html/home.html',usuarios=usuarios,artesao=listaArtesao,carrinho=carrinho,rotaCarrinho=rotaCarrinho,btnCompra=btnCompra,rotaCompra=rotaCompra,logado=logado)
 
 
 @app.route('/adicionarCarrinho', methods=['POST'])
@@ -75,14 +78,40 @@ def adicionarCarrinho():
     return redirect('/')
 
 
+@app.route('/excluirItemCarrinho', methods=['POST'])
+def excluirItemCarrinho():
+    nome_produto = request.form.get('nome_produto')
+    id_vendedor = int(request.form.get('id_vendedor'))
+    with open('clientes.json') as f:
+        usuarios = json.load(f)
+    # Encontrar o usuário correto pelo seu ID
+    for usuario in usuarios:
+        if usuario['id'] == id_vendedor:
+            # Subtrair o valor do item do total_preco
+            usuario['total_preco'] -= usuario['carrinho'][nome_produto]['preco']
+            # Remover o item do carrinho
+            del usuario['carrinho'][nome_produto]
+            # Salvar o conteúdo atualizado de volta no arquivo JSON
+            with open('clientes.json', 'w') as f:
+                json.dump(usuarios, f, indent=4)
+            break  # sair do loop depois de encontrar o usuário correto
+
+    return redirect('/')
 
 
 @app.route('/carrinho')
 def carrinho():
     if 'clienteLogado' in session:
         email = session['clienteLogado']
+        with open('clientes.json') as c:  # abertura do arquivo JSON
+            listaClientes = json.load(c) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
 
-        return render_template('html/cliente.html')
+            for cliente in listaClientes:  # loop para separar os dados 
+                if email == cliente['email']:
+                    nome = cliente['nome']
+                    foto = cliente['foto']
+                    dadosCliente = cliente
+        return render_template('html/cliente.html',nome=nome,foto=foto,dadosCliente=dadosCliente)
     else:
         return redirect('/login')
 
@@ -101,6 +130,8 @@ def acessoCliente():
     senha = request.form.get('SenhaCliente') # pegando a senha do formulario
 
     session['clienteLogado'] = email
+    if 'artesaoLogado' in session:
+        del session['artesaoLogado']
     with open('clientes.json') as clientes:  # abertura do arquivo JSON
         listaCliente = json.load(clientes) # colocando os dados do arquivo JSON dentro da variavel 
 
@@ -119,8 +150,8 @@ def acessoCliente():
 # acesso a pagina do artesão onde ele fara upload dos artesanatos
 @app.route('/artesao')
 def artesao():
-    if 'nomeUsuarioLogado' in session: # Verifica se a chave 'nomeUsuarioLogado' está presente na sessão
-        email = session['nomeUsuarioLogado'] 
+    if 'artesaoLogado' in session: # Verifica se a chave 'nomeUsuarioLogado' está presente na sessão
+        email = session['artesaoLogado'] 
         with open('artesao.json') as TodosArtesao:  # abertura do arquivo JSON
             listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
 
@@ -148,7 +179,9 @@ def loginArtesao():
 def acessoArtesao():
     email = request.form.get('emailArtesao') # pegando o email do formulario
     senha = request.form.get('senhaArtesao') # pegando a senha do formulario
-    session['nomeUsuarioLogado'] = email
+    session['artesaoLogado'] = email
+    if 'clienteLogado' in session:
+        del session['clienteLogado']
     with open('artesao.json') as artesao:  # abertura do arquivo JSON
         listaArtesao = json.load(artesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
         cont = 0
@@ -217,27 +250,42 @@ def enviarEmail():
 # rota e função para envio de foto de perfil
 @app.route('/enviar_foto', methods=['POST'])
 def enviar_foto():
+    retornoRota = request.form.get('retornoRota')
     foto = request.files.get('foto')
     dadosUsuario_str = request.form.get('dadosUsuario')
+    
     # substitui as aspas simples por aspas duplas
     dadosUsuario_str = dadosUsuario_str.replace("'", "\"")
     dadosUsuario = json.loads(dadosUsuario_str)
     nome_arquivo = f"fotoPerfil_{dadosUsuario['nome']}_id_{dadosUsuario['id']}"
     nome_arquivo = secure_filename(nome_arquivo) # obtém a extensão do arquivo carregado e adiciona ao nome do arquivo
     nome_arquivo = f"{nome_arquivo}.{foto.filename.split('.')[-1]}"
-    foto.save(os.path.join('static/fotoPerfil', nome_arquivo))
-    
-    cont = 0
-    with open('artesao.json') as TodosArtesao:  # abertura do arquivo JSON
-        listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
 
-        for artesao in listaArtesao:  # loop para separar os dados 
-            cont +=1
-            if dadosUsuario['email'] == artesao['email']:
-                artesao['foto'] = nome_arquivo # atualiza o nome do arquivo no dicionário correspondente
-                with open('artesao.json', 'w') as TodosArtesao:  # abre o arquivo JSON em modo de escrita
-                    json.dump(listaArtesao, TodosArtesao, indent=4) # escreve a lista atualizada de volta no arquivo JSON
-                return redirect('/artesao')
+    foto.save(os.path.join('static/fotoPerfil', nome_arquivo))
+    if retornoRota == '/artesao':
+        
+        with open('artesao.json') as TodosArtesao:  # abertura do arquivo JSON
+            listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
+
+            for artesao in listaArtesao:  # loop para separar os dados 
+               
+                if dadosUsuario['email'] == artesao['email']:
+                    artesao['foto'] = nome_arquivo # atualiza o nome do arquivo no dicionário correspondente
+                    with open('artesao.json', 'w') as TodosArtesao:  # abre o arquivo JSON em modo de escrita
+                        json.dump(listaArtesao, TodosArtesao, indent=4) # escreve a lista atualizada de volta no arquivo JSON
+    else:
+        with open('clientes.json') as c:  # abertura do arquivo JSON
+            lista = json.load(c) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
+
+            for cliente in lista:  # loop para separar os dados 
+                
+                if dadosUsuario['email'] == cliente['email']:
+                    cliente['foto'] = nome_arquivo # atualiza o nome do arquivo no dicionário correspondente
+                    with open('clientes.json', 'w') as all:  # abre o arquivo JSON em modo de escrita
+                        json.dump(lista, all, indent=4) # escreve a lista atualizada de volta no arquivo JSON
+
+
+    return redirect(retornoRota)
 
 
 

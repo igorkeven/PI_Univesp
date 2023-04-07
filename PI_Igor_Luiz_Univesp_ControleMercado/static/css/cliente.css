@@ -1,0 +1,72 @@
+
+
+
+@import url(/static/css/artesao.css);
+
+
+ h1.seuCarrinho {
+    text-align: center;
+    margin: 5% 25% -10% 25%;
+    padding: auto;
+    position: relative;
+  }
+  
+.produtos {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  
+  .produto {
+    width: 33%;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .produto {
+      width: 50%;
+    }
+  }
+  
+  @media screen and (max-width: 576px) {
+    .produto {
+      width: 100%;
+    }
+  }
+  
+  h1.nome{
+    color: white;
+    
+  }
+
+
+  .menu_perfil{
+    cursor: pointer;
+    font-size: 22px;
+    font-weight: bold;
+
+  }
+
+  .menu_perfil:hover{
+    background-color: rebeccapurple;
+    border-radius: 10px;
+  }
+
+  .apagar_conta {
+    position: absolute;
+    bottom: 20%;
+    left: 0;
+    margin: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #810000;
+    cursor: pointer;
+  }
+
+  .apagar_conta:hover{
+    color: white;
+    background-color: #810000;
+    border-radius: 10px;
+  }
+  

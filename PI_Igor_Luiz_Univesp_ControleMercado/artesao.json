@@ -5,7 +5,7 @@
         "nome": "igor Keven",
         "chavePIX": "123456789",
         "id": 1,
-        "foto": "produto1.jpg",
+        "foto": "",
         "produtos": {
             "mesa de centro": {
                 "imagem": "produto1.jpg",

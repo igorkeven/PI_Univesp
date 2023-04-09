@@ -195,6 +195,44 @@ def acessoArtesao():
                 return redirect('/loginArtesao')
 
 
+@app.route('/novo_produto', methods=['POST'])
+def novo_produto():
+    foto = request.files.get('foto')
+    nome_produto = request.form.get('nome')
+    preco = request.form.get('preco')
+    descricao = request.form.get('descricao')
+    dados_usuario_str = request.form.get('dadosUsuario')
+    
+    # substitui as aspas simples por aspas duplas
+    dados_usuario_str = dados_usuario_str.replace("'", "\"")
+    print(f"dados_usuario_str: {dados_usuario_str}")
+    dados_usuario = json.loads(dados_usuario_str)
+    nome_arquivo = secure_filename(foto.filename) # obtém a extensão do arquivo carregado e adiciona ao nome do arquivo
+    nome_arquivo = f"fotoProduto_{dados_usuario['nome']}_id_{dados_usuario['id']}_{nome_produto}"
+    nome_arquivo = f"{nome_arquivo}.{foto.filename.split('.')[-1]}"
+    foto.save(os.path.join('static/produtos', nome_arquivo))
+
+    with open('artesao.json', 'r') as arq:
+        lista_artesao = json.load(arq)
+
+    for artesao in lista_artesao:
+        if dados_usuario['email'] == artesao['email']:
+            if 'produtos' not in artesao:
+                artesao['produtos'] = {}
+            artesao['produtos'][nome_produto] = {
+                'imagem': nome_arquivo,
+                'descricao': descricao,
+                'preco': float(preco),
+            }
+
+    with open('artesao.json', 'w') as arq:
+        json.dump(lista_artesao, arq, indent=4)
+
+    return redirect('/artesao')
+
+
+
+
 # pagina de recuperação de senha 
 @app.route('/esqueceuSenha')
 def esqueceuSenha():

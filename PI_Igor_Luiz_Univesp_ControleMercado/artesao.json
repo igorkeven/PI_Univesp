@@ -5,39 +5,7 @@
         "nome": "igor Keven",
         "chavePIX": "123456789",
         "id": 1,
-        "foto": "",
-        "produtos": {
-            "mesa de centro": {
-                "imagem": "produto1.jpg",
-                "discricao": "mesa para colocar no centro",
-                "preco": 31.5
-            },
-            "abajur": {
-                "imagem": "produto2.jpg",
-                "discricao": "abajur com lampada que acende",
-                "preco": 10.5
-            },
-            "colher": {
-                "imagem": "produto3.jpg",
-                "discricao": "colher para comer alguma coisa",
-                "preco": 315
-            },
-            "coisa": {
-                "imagem": "produto3.jpg",
-                "discricao": "colher para comer alguma coisa",
-                "preco": 315
-            },
-            "outra coisa": {
-                "imagem": "produto3.jpg",
-                "discricao": "colher para comer alguma coisa",
-                "preco": 315
-            },
-            "mais uma coisa": {
-                "imagem": "produto3.jpg",
-                "discricao": "colher para comer alguma coisa",
-                "preco": 315
-            }
-        }
+        "foto": ""
     },
     {
         "email": "luiz@luiz.com",
@@ -45,7 +13,7 @@
         "nome": "luiz",
         "chavePIX": "123456789",
         "id": 2,
-        "foto": "fotoPerfil_luiz_id_2.png"
+        "foto": ""
     },
     {
         "email": "joao@joao.com",
@@ -53,7 +21,7 @@
         "nome": "joao Keven",
         "chavePIX": "123456789",
         "id": 3,
-        "foto": "produto1.jpg"
+        "foto": ""
     },
     {
         "email": "teste@teste.com",

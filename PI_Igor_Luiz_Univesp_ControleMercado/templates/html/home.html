@@ -52,7 +52,7 @@
           <div class="produto{% if loop.index % 4 == 0 %} ultima{% endif %}">
             <img src="{{ url_for('static', filename='produtos/' + dados['imagem']) }}" alt="{{ produto }}" width="200">
             <h2>{{ produto }}</h2>
-            <p>{{ dados['discricao'] }}</p>
+            <p>{{ dados['descricao'] }}</p>
             <p>Preço: R$ {{ dados['preco'] }}</p>
             <p>vendedor: {{ artesao1['nome'] }}</p>
           

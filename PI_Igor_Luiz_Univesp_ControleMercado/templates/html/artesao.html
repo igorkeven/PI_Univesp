@@ -54,7 +54,7 @@
         
         <div class="formulario_produtos" id="formulario_produtos">
           
-          <form id="enviar_produtos" action="" method="post">
+          <form id="enviar_produtos" action="/novo_produto" method="post" enctype="multipart/form-data">
             
             <label for="foto">Foto</label>
             <input type="file" name="foto" id="foto">
@@ -62,8 +62,9 @@
             <input type="text" name="nome" id="nome">
             <label for="preco">Preço</label>
             <input type="number" name="preco" id="preco">
-            <label for="discricao">Discrição</label>
-            <input type="text" name="discricao" id="discricao">
+            <label for="descricao">Descrição</label>
+            <input type="text" name="descricao" id="descricao">
+            <input type="hidden" name="dadosUsuario" value="{{artesao}}" >
             <input type="submit" value="Enviar">
           </form>
     
@@ -76,7 +77,7 @@
             <div class="produto">
               <img src="{{ url_for('static', filename='produtos/' + dados['imagem']) }}" alt="{{ produto }}" width="200">
               <h2>{{ produto }}</h2>
-              <p>{{ dados['discricao'] }}</p>
+              <p>{{ dados['descricao'] }}</p>
               <p>Preço: R$ {{ dados['preco'] }}</p>
               
               <form action="" method="POST">

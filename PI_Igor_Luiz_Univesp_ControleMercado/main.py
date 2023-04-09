@@ -34,7 +34,7 @@ def index():
         listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
     if 'clienteLogado' in session:
         carrinho = 'click para ver seu carrinho'
-        rotaCarrinho = '/carrinho'
+        rotaCarrinho = '/cliente'
         btnCompra = 'Adicionar no Carrinho'
         rotaCompra = '/adicionarCarrinho'
         logado = True
@@ -99,8 +99,8 @@ def excluirItemCarrinho():
     return redirect('/')
 
 
-@app.route('/carrinho')
-def carrinho():
+@app.route('/cliente')
+def cliente():
     if 'clienteLogado' in session:
         email = session['clienteLogado']
         with open('clientes.json') as c:  # abertura do arquivo JSON
@@ -138,7 +138,7 @@ def acessoCliente():
         for cliente in listaCliente:  # loop para separar os dados 
 
             if email == cliente['email'] and senha == cliente['senha']:#verificação se os dados escrito pelo usuario são iguais os salvos 
-                return redirect('/carrinho')
+                return redirect('/cliente')
             else:
                # flash('Email ou senha incorretos')
                 return redirect('/login')
@@ -234,11 +234,11 @@ def enviarEmail():
 
             if email == usuario['nome'] :#verificação se os dados escrito pelo usuario são iguais os salvos 
                 enviar_email(email, usuario['senha'])
-                # flash(f'Senha enviada para seu Email {email} ')
+                flash(f'Senha enviada para seu Email {email} ')
                 return redirect('/esqueceuSenha') # codigo para enviar o email com a senha
 
             else:
-              #  flash('Email não cadastrado')
+                flash('Email não cadastrado')
                 return redirect('/cadastro')
 
 

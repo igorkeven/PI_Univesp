@@ -21,6 +21,21 @@
                 "imagem": "produto3.jpg",
                 "discricao": "colher para comer alguma coisa",
                 "preco": 315
+            },
+            "coisa": {
+                "imagem": "produto3.jpg",
+                "discricao": "colher para comer alguma coisa",
+                "preco": 315
+            },
+            "outra coisa": {
+                "imagem": "produto3.jpg",
+                "discricao": "colher para comer alguma coisa",
+                "preco": 315
+            },
+            "mais uma coisa": {
+                "imagem": "produto3.jpg",
+                "discricao": "colher para comer alguma coisa",
+                "preco": 315
             }
         }
     },

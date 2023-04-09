@@ -8,6 +8,9 @@
 
 main{
   display: flex;
+  position: relative;
+  height: 100%; /* ou qualquer outra altura que você desejar */
+  overflow: auto;
 }
 
 .perfil {
@@ -25,27 +28,113 @@ main{
     cursor: pointer;
   }
   
-  .produtos {
-    margin-bottom: 10%;
-    margin-top:10% ;
-    position: relative;
-    float: right;
+  h1.nome{
+    color: white;
+    
   }
 
 
+  .menu_perfil{
+    cursor: pointer;
+    font-size: 22px;
+    font-weight: bold;
 
+  }
+
+  .menu_perfil:hover{
+    background-color: rebeccapurple;
+    border-radius: 10px;
+  }
+
+  .apagar_conta {
+    position: absolute;
+    bottom: 20%;
+    left: 0;
+    margin: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #810000;
+    cursor: pointer;
+  }
+
+  .apagar_conta:hover{
+    color: white;
+    background-color: #810000;
+    border-radius: 10px;
+  }
+  
+
+
+  .titulo {
+    text-align: center; /* centraliza o texto */
+    
+    margin: 5% 25%;
+  }
+  
+
+
+  .produtos {
+    
+    margin-left: 10%;
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+    
+  }
+  
+  .produto {
+    width: 25%;
+    padding-left: 100px;
+    box-sizing: border-box;
+  }
+  
+  .produto img {
+    width: 100%;
+  }
+  
+  .produto h2 {
+    font-size: 20px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+  
+  .produto p {
+    font-size: 16px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+  
+  .produto form {
+    margin-top: 10px;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .produto {
+      width: 50%;
+    }
+  }
+  
+
+/* 
   .formulario_produtos {
-    /* flex: 1 0 50px; */
+    flex: 1 0 50px; 
     margin-right: 20%;
     margin-left: 20%;
-    margin-top: 10%;
+    margin-bottom: 30%;
+    width: 400px; 
+    position: absolute;
+    display: none;
+  } */
+
+  .formulario_produtos {
+    flex: 1 0 50px; 
+    margin-right: 20%;
+    margin-left: 20%;
     margin-bottom: 10%;
-    float: left; 
     width: 400px; 
     position: relative;
+    display: none;
   }
-
-
 
   #enviar_produtos label {
     margin-bottom: 10px;

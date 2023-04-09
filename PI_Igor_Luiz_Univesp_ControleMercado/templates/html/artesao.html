@@ -23,7 +23,7 @@
           </header>
 
 
-          
+          <h1 class="titulo" id="titulo">Seus produtos</h1>
 
     
     <main>
@@ -34,16 +34,17 @@
           <img src="/static/arquivos/usuario.png" alt="Foto do artesão {{ nome }}" title="Enviar foto" id="foto-artesao">
         
         <br>
-        <h1>{{ nome }}</h1>
+        <h1 class="nome">{{ nome }}</h1>
         {% else %}
         
           <img src="{{ url_for('static', filename='fotoPerfil/' + foto) }}" width="200" height="200" alt="Foto do artesão {{ nome }}" title="Mudar foto" id="foto-artesao">
        
         <br>
-        <h1>{{ nome }} </h1>
+        <h1 class="nome">{{ nome }} </h1>
         {% endif %}
-        <h3><a href="#">Mudar senha</a></h3>
-        <h3><a href="#">Apagar minha conta</a></h3>
+        <h3 class="menu_perfil">Mudar senha</h3> 
+        <h3 class="menu_perfil" id="escolha_formulario_produtos" > Enviar produtos  </h3>
+        <h3 class="apagar_conta">Apagar minha conta</h3>
       </aside>
       
 
@@ -51,10 +52,10 @@
       
       
         
-        <div class="formulario_produtos">
+        <div class="formulario_produtos" id="formulario_produtos">
           
           <form id="enviar_produtos" action="" method="post">
-            <h1>Enviar produtos</h1><br>
+            
             <label for="foto">Foto</label>
             <input type="file" name="foto" id="foto">
             <label for="nome">Nome</label>
@@ -67,20 +68,24 @@
           </form>
     
         </div>
-
-        <div class="produtos">
-          <h1>Seus produtos</h1>
+        
+        <div class="produtos" id="produtos">
+          
           {% if artesao['produtos'] %}
           {% for produto, dados in artesao['produtos'].items() %}
             <div class="produto">
               <img src="{{ url_for('static', filename='produtos/' + dados['imagem']) }}" alt="{{ produto }}" width="200">
               <h2>{{ produto }}</h2>
-              <p>{{ dados['discrição'] }}</p>
+              <p>{{ dados['discricao'] }}</p>
               <p>Preço: R$ {{ dados['preco'] }}</p>
-              <p>Quantidade em estoque: {{ dados['quantidadeEstoque'] }}</p>
+              
               <form action="" method="POST">
                 <input type="hidden" name="produto_id" value="{{ produto }}">
                 <input type="submit" value="Editar">
+            </form>
+            <form action="" method="post">
+              <input type="hidden" name="produto_id" value="{{ produto }}">
+                <input type="submit" value="Excluir">
             </form>
               <br>
             </div>
@@ -96,6 +101,30 @@
     </footer>
 <script>
   
+  const btnEnviarProdutos = document.querySelector("#escolha_formulario_produtos");
+const divProdutos = document.querySelector("#produtos");
+const divFormularioProdutos = document.querySelector("#formulario_produtos");
+const titulo = document.querySelector("#titulo")
+
+btnEnviarProdutos.addEventListener("click", () => {
+  if (divProdutos.style.display !== "none") {
+    // produtos está visível, então esconda-o e mostre o formulário
+    divProdutos.style.display = "none";
+    divFormularioProdutos.style.display = "flex";
+    btnEnviarProdutos.textContent = "Meus produtos";
+    titulo.textContent = "Enviar Produtos";
+  } else {
+    // produtos está escondido, então mostre-o e esconda o formulário
+    divProdutos.style.display = "block";
+    divFormularioProdutos.style.display = "none";
+    btnEnviarProdutos.textContent = "Enviar produtos";
+    titulo.textContent = "Meus Produtos";
+  }
+});
+
+
+
+
 
 document.getElementById("foto-artesao").addEventListener("click", function() {
   if (this.src.includes("usuario.png")) {

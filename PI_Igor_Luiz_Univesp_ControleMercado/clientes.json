@@ -17,9 +17,15 @@
                 "descricao": "abajur com lampada que acende",
                 "preco": 10.5,
                 "id_vendedor": 1
+            },
+            "colher": {
+                "imagem": "produto3.jpg",
+                "descricao": "colher para comer alguma coisa",
+                "preco": 315.0,
+                "id_vendedor": 1
             }
         },
-        "total_preco": 42.0
+        "total_preco": 357.0
     },
     {
         "nome": "Luiz Eduardo",

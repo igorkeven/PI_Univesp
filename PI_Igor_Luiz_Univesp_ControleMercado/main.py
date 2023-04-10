@@ -194,16 +194,14 @@ def acessoArtesao():
                 flash('Email ou senha incorretos')
                 return redirect('/loginArtesao')
 
-
+# cadastro de novo produto , salva a foto , edita o nome e coloca o novonome junto ao arquivo do usuario
 @app.route('/novo_produto', methods=['POST'])
 def novo_produto():
     foto = request.files.get('foto')
     nome_produto = request.form.get('nome')
     preco = request.form.get('preco')
     descricao = request.form.get('descricao')
-    dados_usuario_str = request.form.get('dadosUsuario')
-    
-    # substitui as aspas simples por aspas duplas
+    dados_usuario_str = request.form.get('dadosUsuario') 
     dados_usuario_str = dados_usuario_str.replace("'", "\"")
     print(f"dados_usuario_str: {dados_usuario_str}")
     dados_usuario = json.loads(dados_usuario_str)
@@ -232,6 +230,124 @@ def novo_produto():
 
 
 
+
+
+@app.route('/editar_produto', methods=['POST'])
+def editar_produto():
+    # Recebe os dados do formulário enviado
+    nome = request.form.get('editar_nome')
+    preco = request.form.get("editar_preco")
+    descricao = request.form.get("editar_descricao")
+    produto_dados_str = request.form.get("editar_produto_dados")
+    produto_dados_str = produto_dados_str.replace("'", "\"")
+    produto_dados = json.loads(produto_dados_str)
+    nomeAntigo = request.form.get('nomeAntigo')
+
+    # Carrega o arquivo JSON em memória
+    with open('artesao.json', 'r') as f:
+        data = json.load(f)
+
+        for artesao in data:
+            if produto_dados['id'] == artesao['id']:
+                produtos = artesao['produtos']
+                produtos_chaves = list(produtos.keys())
+                index_antigo = produtos_chaves.index(nomeAntigo)
+
+                produtos[nome] = {
+                    "imagem": produtos[nomeAntigo]['imagem'],
+                    "descricao": descricao,
+                    "preco": preco
+                }
+                produtos.pop(nomeAntigo)
+                produtos_chaves.pop(index_antigo)
+                produtos_chaves.insert(index_antigo, nome)
+                artesao['produtos'] = {chave: produtos[chave] for chave in produtos_chaves}
+
+    with open('artesao.json', 'w') as f:
+        json.dump(data, f, indent=4)
+
+
+
+    # Redireciona o usuário para a página principal
+    return redirect('/artesao')
+
+
+# excluir produto
+@app.route('/excluir_produto', methods=['POST'])
+def excluir_produto():
+    # Recebe o nome do produto a ser excluído do formulário enviado
+    nome_produto = request.form.get('nomeProduto')
+    produto_dados_str = request.form.get("produto_dados")
+    produto_dados_str = produto_dados_str.replace("'", "\"")
+    produto_dados = json.loads(produto_dados_str)
+
+    # Carrega o arquivo JSON em memória
+    with open('artesao.json', 'r') as f:
+        data = json.load(f)
+
+        for artesao in data:
+            if produto_dados['id'] == artesao['id']:
+                # pega o nome da imagem
+                imagem_produto = artesao['produtos'][nome_produto]['imagem']
+                # apaga a imagem do diretorio
+                os.remove(os.path.join('static/produtos', imagem_produto))
+                # Remove o produto do dicionário de produtos do artesão
+                del artesao['produtos'][nome_produto]
+
+    # Salva as alterações no arquivo JSON
+    with open('artesao.json', 'w') as f:
+        json.dump(data, f, indent=4)
+
+    # Redireciona o usuário para a página principal
+    return redirect('/artesao')
+
+#mudar senha artesão
+@app.route('/mudar_senha', methods=['POST'])
+def mudar_senha():
+
+    novasenha = request.form.get('novaSenha')
+    dados_usuario_str =  request.form.get('dadosUsuario')
+    dados_usuario_str = dados_usuario_str.replace("'", "\"")
+    dados_usuario = json.loads(dados_usuario_str)
+
+    with open('artesao.json') as f:
+        artesoes = json.load(f)
+        for artesao in artesoes:
+            if artesao['email'] == dados_usuario['email']:
+                artesao['senha'] = novasenha
+    
+    with open('artesao.json', 'w') as f:
+        json.dump(artesoes, f, indent=4)
+        
+
+
+    return redirect('/artesao')
+
+# apagar conta de usuario artesão
+@app.route('/apagar_conta', methods=['POST'])
+def apagar_conta():
+    emailUsuario = request.form.get('EmailUsuario')
+
+    with open('clientes.json') as f:
+        usuarios = json.load(f)
+
+
+
+    if 'artesaoLogado' in session:
+        
+        with open('artesao.json') as TodosArtesao: 
+            listaArtesao = json.load(TodosArtesao)
+            for artesao in listaArtesao:
+                if artesao['email'] == emailUsuario:
+                    
+                    listaArtesao.remove(artesao)
+                    del session['artesaoLogado']
+        with open('artesao.json', 'w') as f:
+            json.dump(listaArtesao, f, indent=4)
+                
+
+
+    return redirect('/')
 
 # pagina de recuperação de senha 
 @app.route('/esqueceuSenha')

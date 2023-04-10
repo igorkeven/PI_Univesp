@@ -42,9 +42,9 @@
         <br>
         <h1 class="nome">{{ nome }} </h1>
         {% endif %}
-        <h3 class="menu_perfil">Mudar senha</h3> 
+        <h3 class="menu_perfil" id="escolha_formulario_senha">Mudar senha</h3> 
         <h3 class="menu_perfil" id="escolha_formulario_produtos" > Enviar produtos  </h3>
-        <h3 class="apagar_conta">Apagar minha conta</h3>
+        <h3 class="apagar_conta" id="apagar_conta">Apagar minha conta</h3>
       </aside>
       
 
@@ -75,42 +75,200 @@
           {% if artesao['produtos'] %}
           {% for produto, dados in artesao['produtos'].items() %}
             <div class="produto">
-              <img src="{{ url_for('static', filename='produtos/' + dados['imagem']) }}" alt="{{ produto }}" width="200">
+              <img src="{{ url_for('static', filename='produtos/' + dados['imagem']) }}" id="img_produto" alt="{{ produto }}" width="200">
               <h2>{{ produto }}</h2>
               <p>{{ dados['descricao'] }}</p>
               <p>Preço: R$ {{ dados['preco'] }}</p>
               
-              <form action="" method="POST">
-                <input type="hidden" name="produto_id" value="{{ produto }}">
-                <input type="submit" value="Editar">
-            </form>
-            <form action="" method="post">
-              <input type="hidden" name="produto_id" value="{{ produto }}">
-                <input type="submit" value="Excluir">
+              
+              <button id="Editar">Editar</button>
+            
+            <form action="excluir_produto" method="post">
+              <input type="hidden" name="nomeProduto" value="{{ produto }}">
+              <input type="hidden" id="produto_dados" name="produto_dados" value="{{artesao}}">
+                <input type="submit" id="excluir" value="Excluir">
             </form>
               <br>
             </div>
           {% endfor %}
           {% endif %}
         </div>
+
+
+        
+        <div id="editar-produto"  >
+          <img id="imagem-produto" src="" alt="Imagem do produto" width="200">
+          <form id="form-editar-produto" method="post" action="/editar_produto" >
+            <label for="editar_nome">Nome:</label>
+            <input type="text" id="editar_nome" name="editar_nome">
+            <br>
+            <label for="editar_preco">Preço:</label>
+            <input type="number" id="editar_preco" name="editar_preco">
+            <br>
+            <label for="editar_descricao">Descrição:</label>
+            <textarea id="editar_descricao" name="editar_descricao"></textarea>
+            <br>
+            <input type="hidden" name="nomeAntigo" id="nomeAntigo">
+            <input type="hidden" id="editar_produto_dados" name="editar_produto_dados" value="{{artesao}}">
+            <input type="submit" value="Salvar">
+            <button type="button" id="cancelar-edicao">Cancelar</button>
+          </form>
+        </div>
+
+
+
+        <div id="formulario_senha">
+
+          <form action="/mudar_senha" method="post" id="formMudarSenha">
+            <label for="novaSenha">Nova Senha:</label>
+            <input type="password" name="novaSenha" id="novaSenha" placeholder="Digite sua nova senha" required>
+            <label for="repetirNovaSenha">Repetir Nova Senha</label>
+            <input type="password" name="repetirNovaSenha" id="repetirNovaSenha" placeholder="Repetir Nova Senha" required>
+            <input type="hidden" name="dadosUsuario" value="{{artesao}}">
+            <div id="mensagemErroSenha"></div>
+            <input type="submit" value="Salvar">
+          </form>
+
+        </div>
+
+        <div id="modal_apagarConta" class="modal_apagarConta">
+          <div class="modal-content">
+            <h4>Tem certeza que deseja apagar sua conta?</h4>
+            <p>Essa ação é permanente e não pode ser desfeita.</p>
+            <div class="modal-buttons">
+              <button id="cancelarApagarConta">Cancelar</button>
+              <form action="/apagar_conta" method="post">
+                <input type="hidden" name="EmailUsuario" value="{{artesao['email']}}">
+                
+                <input type="submit"  id="confirmarApagarConta" value="Confirmar">
+              </form>
               
+            </div>
+          </div>
+        </div>
+        
       
     </main>
      
     <footer>
       <p>&copy; 2023 Marketplace de Produtos Artesanais Igor & Luiz</p>
     </footer>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
+
+
+
+// codigo para fazer aparecer o modal de confirmação de apagar a conta
+const apagarContaButton = document.querySelector('.apagar_conta');
+const modalApagarConta = document.querySelector('#modal_apagarConta');
+const cancelarButton = document.querySelector('#cancelarApagarConta');
+
+apagarContaButton.addEventListener('click', () => {
+  modalApagarConta.style.display = "block";
+});
+
+cancelarButton.addEventListener('click', () => {
+  modalApagarConta.style.display = "none";
+});
+
+
+
+
+
+
+// codigo para verificar se a nova senha e a repetição são iguis 
+const formMudarSenha = document.querySelector("#formMudarSenha");
+const novaSenha = document.querySelector("#novaSenha");
+const repetirNovaSenha = document.querySelector("#repetirNovaSenha");
+const mensagemErroSenha = document.querySelector("#mensagemErroSenha");
+
+formMudarSenha.addEventListener("submit", (event) => {
+  if (novaSenha.value !== repetirNovaSenha.value) {
+    mensagemErroSenha.textContent = "As senhas não são iguais.";
+    event.preventDefault();
+  }
+});
+
+
+
+
+
+
+  // codigo do botão para cancelar a edição do produto
+var botaoCancelar = document.querySelectorAll("#cancelar-edicao");
+botaoCancelar.forEach(function(botao){
+  botao.addEventListener('click',function(){
+    document.querySelector('#produtos').style.display = 'block';
+      document.querySelector('#editar-produto').style.display = 'none';
+      titulo.textContent = "Meus Produtos";
+
+});
+} ) 
   
-  const btnEnviarProdutos = document.querySelector("#escolha_formulario_produtos");
+
+  
+  // Seleciona todos os botões "Editar"
+  var botoesEditar = document.querySelectorAll('#Editar');
+  
+  // Adiciona um evento de clique para cada botão "Editar"
+  botoesEditar.forEach(function(botao) {
+    botao.addEventListener('click', function() {
+      // Obtém a imagem do produto correspondente ao botão "Editar" clicado
+
+        
+
+      // Obtém os dados do produto selecionado
+      var produto = botao.parentNode.querySelector('h2').textContent;
+      var preco = botao.parentNode.querySelector('p:nth-child(4)').textContent.replace('Preço: R$ ', '');
+      var descricao = botao.parentNode.querySelector('p:nth-child(3)').textContent;
+      //var imagem = $(this).siblings("img").attr("src");
+      var imagem = botao.parentNode.querySelector('img').src;
+
+      //$("#imagem-produto").attr("src", imagem);
+      // Preenche os campos do formulário de edição com os dados do produto
+      document.querySelector('#editar_nome').value = produto;
+      document.querySelector('#editar_preco').value = preco;
+      document.querySelector('#editar_descricao').value = descricao;
+      document.querySelector('#nomeAntigo').value = produto;
+      document.querySelector('#imagem-produto').setAttribute('src', imagem);
+
+      // Oculta a lista de produtos e mostra o formulário de edição
+      document.querySelector('#produtos').style.display = 'none';
+      document.querySelector('#editar-produto').style.display = 'block';
+      titulo.textContent = "Editar Produto";
+      
+    });
+  });
+
+
+
+
+
+
+// codigo para mostrar ou escolher o formulario escolhido
+const btnEnviarProdutos = document.querySelector("#escolha_formulario_produtos");
 const divProdutos = document.querySelector("#produtos");
 const divFormularioProdutos = document.querySelector("#formulario_produtos");
+const editar = document.querySelector("#editar-produto");
 const titulo = document.querySelector("#titulo")
+const btnMudarSenha = document.querySelector("#escolha_formulario_senha");
+const divFormularioSenha = document.querySelector("#formulario_senha");
+
+btnMudarSenha.addEventListener("click", () => {
+  divFormularioSenha.style.display = 'flex';
+  divProdutos.style.display = "none";
+  divFormularioProdutos.style.display = "none";
+  editar.style.display = 'none';
+  
+})
+
 
 btnEnviarProdutos.addEventListener("click", () => {
   if (divProdutos.style.display !== "none") {
     // produtos está visível, então esconda-o e mostre o formulário
     divProdutos.style.display = "none";
+    divFormularioSenha.style.display = 'none';
     divFormularioProdutos.style.display = "flex";
     btnEnviarProdutos.textContent = "Meus produtos";
     titulo.textContent = "Enviar Produtos";
@@ -118,6 +276,8 @@ btnEnviarProdutos.addEventListener("click", () => {
     // produtos está escondido, então mostre-o e esconda o formulário
     divProdutos.style.display = "block";
     divFormularioProdutos.style.display = "none";
+    editar.style.display = 'none';
+    divFormularioSenha.style.display = 'none';
     btnEnviarProdutos.textContent = "Enviar produtos";
     titulo.textContent = "Meus Produtos";
   }
@@ -127,6 +287,9 @@ btnEnviarProdutos.addEventListener("click", () => {
 
 
 
+
+
+// codigo para aparecer o modal de envio de foto do perfil
 document.getElementById("foto-artesao").addEventListener("click", function() {
   if (this.src.includes("usuario.png")) {
     // Usuário ainda não tem uma imagem definida, permitir a mudança da imagem sem alerta

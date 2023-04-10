@@ -5,7 +5,14 @@
         "nome": "igor Keven",
         "chavePIX": "123456789",
         "id": 1,
-        "foto": ""
+        "foto": "",
+        "produtos": {
+            "banana ma\u00e7\u00e3": {
+                "imagem": "fotoProduto_igor Keven_id_1_banana ma\u00e7\u00e3.jpg",
+                "descricao": "um pouco de banana ma\u00e7\u00e3",
+                "preco": 145.0
+            }
+        }
     },
     {
         "email": "luiz@luiz.com",
@@ -13,23 +20,14 @@
         "nome": "luiz",
         "chavePIX": "123456789",
         "id": 2,
-        "foto": ""
-    },
-    {
-        "email": "joao@joao.com",
-        "senha": "123",
-        "nome": "joao Keven",
-        "chavePIX": "123456789",
-        "id": 3,
-        "foto": ""
-    },
-    {
-        "email": "teste@teste.com",
-        "senha": "123",
-        "nome": "teste 1",
-        "chavePIX": "123456",
-        "id": 4,
-        "foto": ""
+        "foto": "",
+        "produtos": {
+            "banana prata": {
+                "imagem": "fotoProduto_luiz_id_2_banana prata.jpg",
+                "descricao": "um pouco de banana prata",
+                "preco": 45.0
+            }
+        }
     },
     {
         "email": "teste2@teste.com",

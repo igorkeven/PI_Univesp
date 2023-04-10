@@ -71,7 +71,16 @@ main{
     margin: 5% 25%;
   }
   
+#editar-produto{
+  flex: 1 0 50px; 
+  margin-right: 20%;
+  margin-left: 20%;
+  margin-bottom: 10%;
+  width: 400px; 
+  position: relative;
+  display: none;
 
+}
 
   .produtos {
     
@@ -116,16 +125,22 @@ main{
   }
   
 
-/* 
-  .formulario_produtos {
+  #formulario_senha{
     flex: 1 0 50px; 
     margin-right: 20%;
     margin-left: 20%;
-    margin-bottom: 30%;
+    margin-bottom: 10%;
     width: 400px; 
-    position: absolute;
+    position: relative;
     display: none;
-  } */
+    }
+
+    
+    #mensagemErroSenha{
+      color: red;
+    }
+    
+
 
   .formulario_produtos {
     flex: 1 0 50px; 
@@ -137,16 +152,24 @@ main{
     display: none;
   }
 
-  #enviar_produtos label {
+  label {
     margin-bottom: 10px;
     font-weight: bold;
     display: block;
 
   }
-  
-  #enviar_produtos input[type="file"],
-  #enviar_produtos input[type="text"],
-  #enviar_produtos input[type="number"] {
+
+#editar_nome ,#editar_preco, #editar_descricao{
+  width: 30%;
+}
+
+
+
+
+  input[type="password"],
+  input[type="file"],
+  input[type="text"],
+  input[type="number"] {
     display: block;
     
     width: 100%;
@@ -162,7 +185,7 @@ main{
 
   }
   
-  form input[type="submit"] {
+  form input[type="submit"] , button#Editar , #cancelar-edicao {
     background-color: #007bff;
     color: #fff;
     padding: 10px 20px;
@@ -173,19 +196,32 @@ main{
   }
 
 
-  .formulario_produtos input[type="submit"]:hover {
+  .formulario_produtos input[type="submit"]:hover , button#Editar:hover {
     background-color: #0059b3;
   }
 
 
+#excluir:hover , #cancelar-edicao:hover {
+  background-color: #810000;
+}
 
+.modal_apagarConta {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
 
- 
 
 
 
   /* estilo do enviar foto do perfil */
-  .modal {
+  .modal  {
     position: fixed;
     z-index: 1;
     left: 0;

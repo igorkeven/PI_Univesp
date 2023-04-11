@@ -4,14 +4,39 @@
         "email": "igor@igor.com",
         "senha": "123",
         "id": 1,
-        "foto": ""
-        
+        "foto": "",
+        "carrinho": {
+            "banana ma\u00e7\u00e3": {
+                "imagem": "fotoProduto_igor Keven_id_1_banana ma\u00e7\u00e3.jpg",
+                "descricao": "",
+                "preco": 145.0,
+                "id_vendedor": 1,
+                "quantidade": 1
+            },
+            "banana prata": {
+                "imagem": "fotoProduto_luiz_id_2_banana prata.jpg",
+                "descricao": null,
+                "preco": 45.0,
+                "id_vendedor": 2,
+                "quantidade": 1
+            },
+            "igor": {
+                "imagem": "fotoProduto_teste 2_id_5_igor.jpg",
+                "descricao": "to vendendo o igor",
+                "preco": 100.0,
+                "id_vendedor": 5,
+                "quantidade": 1
+            }
+        },
+        "total_preco": 290.0
     },
     {
         "nome": "Luiz Eduardo",
         "email": "luiz@luiz.com",
         "senha": "123",
         "id": 2,
-        "foto": ""
+        "foto": "",
+        "carrinho": {},
+        "total_preco": 0.0
     }
 ]

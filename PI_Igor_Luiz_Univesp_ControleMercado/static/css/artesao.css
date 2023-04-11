@@ -5,6 +5,11 @@
 
 
 
+#alerta{
+  margin-left: 20%;
+  
+}
+
 
 main{
   display: flex;
@@ -62,8 +67,19 @@ main{
     background-color: #810000;
     border-radius: 10px;
   }
-  
+  #confirmarApagarConta{
+    background-color: red;
+  }
 
+
+  #confirmarApagarConta:hover{
+    background-color: #810000;
+  }
+
+  .modal-buttons {
+    display: flex;
+    justify-content: space-between;
+  }
 
   .titulo {
     text-align: center; /* centraliza o texto */
@@ -185,7 +201,7 @@ main{
 
   }
   
-  form input[type="submit"] , button#Editar , #cancelar-edicao {
+  form input[type="submit"] , button#Editar , #cancelar-edicao, #cancelarApagarConta {
     background-color: #007bff;
     color: #fff;
     padding: 10px 20px;
@@ -196,7 +212,7 @@ main{
   }
 
 
-  .formulario_produtos input[type="submit"]:hover , button#Editar:hover {
+  .formulario_produtos input[type="submit"]:hover , button#Editar:hover , #cancelarApagarConta:hover {
     background-color: #0059b3;
   }
 

@@ -51,69 +51,132 @@ def index():
 @app.route('/adicionarCarrinho', methods=['POST'])
 def adicionarCarrinho():
     imagem = request.form.get('imagem')
-    discricao = request.form.get('discricao')
+    descricao = request.form.get('descricao')
     preco = float(request.form.get('preco'))
     nome_produto = request.form.get('nome_produto')
     id_vendedor = int(request.form.get('id_vendedor'))
+    pagina = request.form.get('pagina')
     with open('clientes.json') as f:
         usuarios = json.load(f)
     # Encontrar o usuário correto pelo seu ID
     for usuario in usuarios:
-        if usuario['id'] == id_vendedor:
-            # Adicionar o novo produto ao carrinho do usuário
-            usuario['carrinho'][nome_produto] = {
-                'imagem': imagem,
-                'descricao': discricao,
-                'preco': preco,
-                'id_vendedor': id_vendedor
-            }
+        if usuario['email'] == session['clienteLogado']:
+
+            # Verificar se o produto já está no carrinho
+            if nome_produto in usuario['carrinho']:
+                # Incrementar a quantidade do produto em 1
+                usuario['carrinho'][nome_produto]['quantidade'] += 1
+            else:
+                # Adicionar um novo produto ao carrinho
+                usuario['carrinho'][nome_produto] = {
+                    'imagem': imagem,
+                    'descricao': descricao,
+                    'preco': preco,
+                    'id_vendedor': id_vendedor,
+                    'quantidade': 1
+                }
             # Somar os preços dos produtos no carrinho do usuário
-            total_preco = sum([produto['preco'] for produto in usuario['carrinho'].values()])
+            total_preco = sum([produto['preco'] * produto['quantidade'] for produto in usuario['carrinho'].values()])
             usuario['total_preco'] = total_preco
             # Salvar o conteúdo atualizado de volta no arquivo JSON
             with open('clientes.json', 'w') as f:
                 json.dump(usuarios, f, indent=4)
             break  # sair do loop depois de encontrar o usuário correto
 
+
+    if pagina == 'paginaCliente':
+        return redirect('/cliente')
     return redirect('/')
+
+
+
+
 
 
 @app.route('/excluirItemCarrinho', methods=['POST'])
 def excluirItemCarrinho():
     nome_produto = request.form.get('nome_produto')
-    id_vendedor = int(request.form.get('id_vendedor'))
+    id_vendedor = request.form.get('id_vendedor')
+    pagina = request.form.get('pagina')
     with open('clientes.json') as f:
         usuarios = json.load(f)
+
     # Encontrar o usuário correto pelo seu ID
     for usuario in usuarios:
-        if usuario['id'] == id_vendedor:
+         if usuario['carrinho'][nome_produto] :
             # Subtrair o valor do item do total_preco
-            usuario['total_preco'] -= usuario['carrinho'][nome_produto]['preco']
-            # Remover o item do carrinho
-            del usuario['carrinho'][nome_produto]
+            usuario['total_preco'] -= usuario['carrinho'][nome_produto]['preco'] 
+            
+            # Verificar se a quantidade é maior que 1 antes de subtrair
+            if usuario['carrinho'][nome_produto]['quantidade'] > 1:
+                usuario['carrinho'][nome_produto]['quantidade'] -= 1
+            else:
+                del usuario['carrinho'][nome_produto]  # Se a quantidade for 1, remover o produto do carrinho
+            
             # Salvar o conteúdo atualizado de volta no arquivo JSON
             with open('clientes.json', 'w') as f:
                 json.dump(usuarios, f, indent=4)
             break  # sair do loop depois de encontrar o usuário correto
 
+    if pagina == 'paginaCliente':
+        return redirect('/cliente')
+
     return redirect('/')
+
+
+
+
+
+
 
 
 @app.route('/cliente')
 def cliente():
     if 'clienteLogado' in session:
         email = session['clienteLogado']
-        with open('clientes.json') as c:  # abertura do arquivo JSON
-            listaClientes = json.load(c) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
+        with open('clientes.json') as c:
+            listaClientes = json.load(c)
+        with open('artesao.json') as f:
+            listaArtesao = json.load(f)
 
-            for cliente in listaClientes:  # loop para separar os dados 
+            ids_vendedores = []
+            total_vendas = {} # dicionário para armazenar o valor total de vendas de cada vendedor
+            for cliente in listaClientes:
                 if email == cliente['email']:
                     nome = cliente['nome']
                     foto = cliente['foto']
                     dadosCliente = cliente
-        return render_template('html/cliente.html',nome=nome,foto=foto,dadosCliente=dadosCliente)
-    else:
-        return redirect('/login')
+
+                    if cliente['carrinho']:
+                        for produto, dados in cliente['carrinho'].items():
+                            id_vendedor = dados['id_vendedor']
+                            if id_vendedor not in ids_vendedores:
+                                ids_vendedores.append(id_vendedor)
+                            # adiciona o valor da venda do produto ao valor total de vendas do vendedor
+                            if id_vendedor not in total_vendas:
+                                total_vendas[id_vendedor] = dados['preco'] * dados['quantidade']
+                            else:
+                                total_vendas[id_vendedor] += dados['preco'] * dados['quantidade']
+
+                    #dadosCliente['chavePIX'] = listaArtesao[id_vendedor - 1]['chavePIX'] # adiciona a chavePIX do vendedor ao cliente
+                    valor_total_pago = dadosCliente['total_preco']
+                    valor_total_vendas = sum(total_vendas.values())
+
+                    # cria um dicionário para armazenar o valor que cada vendedor irá receber
+                    valor_recebido_por_vendedor = {}
+                    for vendedor in ids_vendedores:
+                        valor_recebido_por_vendedor[vendedor] = (total_vendas[vendedor] / valor_total_vendas) * valor_total_pago
+
+                    # passa as informações para o template HTML
+                    return render_template('html/cliente.html', nome=nome, foto=foto,listaArtesao=listaArtesao , valor_recebido_por_vendedor=valor_recebido_por_vendedor,dadosCliente=dadosCliente)
+
+                else:
+                    return redirect('/login')
+
+
+
+
+
 
 
 
@@ -134,13 +197,13 @@ def acessoCliente():
         del session['artesaoLogado']
     with open('clientes.json') as clientes:  # abertura do arquivo JSON
         listaCliente = json.load(clientes) # colocando os dados do arquivo JSON dentro da variavel 
-
+        cont = 0
         for cliente in listaCliente:  # loop para separar os dados 
-
+            cont +=1
             if email == cliente['email'] and senha == cliente['senha']:#verificação se os dados escrito pelo usuario são iguais os salvos 
                 return redirect('/cliente')
-            else:
-               # flash('Email ou senha incorretos')
+            if cont >= len(listaCliente):
+                flash('Email ou senha incorretos')
                 return redirect('/login')
 
 
@@ -187,7 +250,7 @@ def acessoArtesao():
         cont = 0
         for artesao in listaArtesao:  # loop para separar os dados 
             cont +=1
-            print(artesao['email'])
+            
             if email == artesao['email'] and senha == artesao['senha']:#verificação se os dados escrito pelo usuario são iguais os salvos 
                 return redirect('/artesao')
             if cont >= len(listaArtesao):
@@ -309,27 +372,40 @@ def mudar_senha():
     dados_usuario_str =  request.form.get('dadosUsuario')
     dados_usuario_str = dados_usuario_str.replace("'", "\"")
     dados_usuario = json.loads(dados_usuario_str)
-
-    with open('artesao.json') as f:
-        artesoes = json.load(f)
-        for artesao in artesoes:
-            if artesao['email'] == dados_usuario['email']:
-                artesao['senha'] = novasenha
-    
-    with open('artesao.json', 'w') as f:
-        json.dump(artesoes, f, indent=4)
+    if 'artesaoLogado' in session:
+        with open('artesao.json') as f:
+            artesoes = json.load(f)
+            for artesao in artesoes:
+                if artesao['email'] == dados_usuario['email']:
+                    artesao['senha'] = novasenha
         
+        with open('artesao.json', 'w') as f:
+            json.dump(artesoes, f, indent=4)
+        flash(f'Senha alterada com sucesso, a nova senha é {novasenha}')
+        return redirect('/artesao')
+    
+    if 'clienteLogado' in session:
+        with open('clientes.json') as f:
+            usuarios = json.load(f)
+            for usuario in usuarios:
+                if usuario['email'] == dados_usuario['email']:
+                    usuario['senha'] = novasenha
+                    
+        with open('clientes.json', 'w') as f:
+            json.dump(usuarios, f, indent=4)
+        flash(f'Senha alterada com sucesso, a nova senha é {novasenha}')
+        return redirect('/cliente')
 
 
-    return redirect('/artesao')
+   
+
+
+    
 
 # apagar conta de usuario artesão
 @app.route('/apagar_conta', methods=['POST'])
 def apagar_conta():
     emailUsuario = request.form.get('EmailUsuario')
-
-    with open('clientes.json') as f:
-        usuarios = json.load(f)
 
 
 
@@ -344,7 +420,18 @@ def apagar_conta():
                     del session['artesaoLogado']
         with open('artesao.json', 'w') as f:
             json.dump(listaArtesao, f, indent=4)
-                
+    
+
+    if 'clienteLogado' in session:
+        with open('clientes.json') as f:
+            usuarios = json.load(f)
+            for usuario in usuarios:
+                if usuario['email'] == emailUsuario:
+                    usuarios.remove(usuario)
+                    del session['clienteLogado']
+        with open('clientes.json', 'w') as f:
+            json.dump(usuarios, f, indent=4)
+
 
 
     return redirect('/')
@@ -506,11 +593,14 @@ def cadastrarCliente():
         "email": email,
         "senha": senha,
         "id": id ,
-        "foto": ""}] # a foto de perfil sempre inicia vazia, depois o usuario pode adicionar uma...
+        "foto": "",
+        "carrinho": {}
+        }
+        ] # a foto de perfil sempre inicia vazia, depois o usuario pode adicionar uma...
     novaListaCliente = listaCliente + user # concatenando todos usuarios ja salvos com o novo e colocando em uma variavel
     with open('clientes.json', 'w') as cliente_json:# abrindo o arquivo JSON em mode de escrita(para edições)
         json.dump(novaListaCliente,cliente_json, indent=4 )# salvando todos incluindo o novo usuario no arquivo JSON
-    flash('Usuario cadastrado com sucesso!! BOAS VENDAS !!')
+    flash('Usuario cadastrado com sucesso!! BOAS COMPRAS !!')
     return redirect('/login') # redireciona para o login junto com a menssagem flash
 
 

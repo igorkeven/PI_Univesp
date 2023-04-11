@@ -55,21 +55,24 @@
             <p>{{ dados['descricao'] }}</p>
             <p>Preço: R$ {{ dados['preco'] }}</p>
             <p>vendedor: {{ artesao1['nome'] }}</p>
+            
           
 
             <form action="{{rotaCompra}}" method="{% if rotaCompra == '/adicionarCarrinho' %}POST{% else %}GET{% endif %}">
               <input type="hidden" name="imagem" value="{{ dados['imagem'] }}">
-              <input type="hidden" name="discricao" value="{{ dados['discricao'] }}">
+              <input type="hidden" name="descricao" value="{{ dados['descricao'] }}">
               <input type="hidden" name="preco" value="{{ dados['preco'] }}">
               <input type="hidden" name="nome_produto" value="{{produto}}">
               <input type="hidden" name="id_vendedor" value="{{artesao1['id']}}">
+              <input type="hidden" name="pagina" value="paginaInicial">
+              
               {% if rotaCompra == '/adicionarCarrinho' %}
               {% for usuario in usuarios %}
-                  {% if usuario['id'] == artesao1['id'] %}
+                  {% if usuario['carrinho']  %}
                   
                       {% if usuario['carrinho'].get(produto) is not none %}
                           
-                          <input type="submit" value="{{produto}} no carrinho&#10;Adicionar + 1" >
+                          <input type="submit" value="{{produto}} no carrinho&#10;quantidade: {{usuario['carrinho'][produto]['quantidade']}}&#10;Adicionar + 1" >
                 
 
                       {% else %}
@@ -84,7 +87,7 @@
           <br>
           {% if rotaCompra == '/adicionarCarrinho' %}
           {% for usuario in usuarios %}
-          {% if usuario['id'] == artesao1['id'] %}
+          {% if usuario['carrinho'] %}
               {% if usuario['carrinho'].get(produto) is not none %}
 
           <form action="/excluirItemCarrinho" method="post">

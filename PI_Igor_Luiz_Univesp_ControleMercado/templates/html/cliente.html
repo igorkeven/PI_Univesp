@@ -23,8 +23,15 @@
           </header>
 
 
+          <h1 class="titulo" id="titulo">Seu carrinho</h1>
+          {% set mensagens = get_flashed_messages() %}
+          {% if mensagens %}
+              <div id="alerta">
+                  {{mensagens[0]}}
+              </div>
+          {% endif %}
+
           
-          <h1 class="seuCarrinho">Seu carrinho</h1>
     
     <main>
       <aside class="perfil">
@@ -41,26 +48,32 @@
         <br>
         <h1 class="nome"> {{ nome }} </h1>
         {% endif %}
-        <h3 class="menu_perfil">Mudar senha</h3>
+        <h3 class="menu_perfil"  id="escolha_formulario_senha" >Mudar senha</h3>
         <h3 class="menu_perfil" >Historico de compras</h3>
-        
+        <h3 class="menu_perfil" id="meus_pedidos" > Meus Pedidos  </h3>
         <h3  > Total a pagar: {{dadosCliente['total_preco']}}</h3>
         <h3 class="menu_perfil" id="finalizarCompra">Finalizar compra</h3>
         <h3 class="apagar_conta" >Apagar minha conta</h3>
       </aside>
       
-      <div class="produtos">
+      <div class="produtos" id="produtos">
         
         {% if dadosCliente['carrinho'] %}
         
         {% for produto, dados in dadosCliente['carrinho'].items() %}
 
-        <div class="produto{% if loop.index % 4 == 0 %} ultima{% endif %}">
+        <div class="produto">
           <img src="{{ url_for('static', filename='produtos/' + dados['imagem']) }}" alt="{{ produto }}" width="200">
           <h2>{{ produto }}</h2>
-          <p>{{ dados['discricao'] }}</p>
+          <p>{{ dados['descricao'] }}</p>
           <p>Preço: R$ {{ dados['preco'] }}</p>
-          <p>vendedor: {{ dadosCliente['nome'] }}</p>
+          {% for artesao in listaArtesao %}
+          {% if dados['id_vendedor'] == artesao['id'] %}
+          <p>vendedor: {{ artesao['nome'] }}</p>
+          {% endif %}
+          {% endfor %}
+          
+          
         
 
           <form action="/adicionarCarrinho" method="POST">
@@ -69,7 +82,8 @@
             <input type="hidden" name="preco" value="{{ dados['preco'] }}">
             <input type="hidden" name="nome_produto" value="{{produto}}">
             <input type="hidden" name="id_vendedor" value="{{dados['id_vendedor']}}">
-            <input type="submit" value="{{produto}} no carrinho&#10;Adicionar + 1" >
+            <input type="submit" value=" {{produto}} no carrinho&#10;quantidade: {{dados['quantidade']}}&#10;Adicionar + 1" >
+            <input type="hidden" name="pagina" value="paginaCliente">
          
         </form>
         <br>
@@ -77,7 +91,7 @@
         <form action="/excluirItemCarrinho" method="post">
           <input type="hidden" name="nome_produto" value="{{produto}}">
           <input type="hidden" name="id_vendedor" value="{{dados['id_vendedor']}}">
-
+          <input type="hidden" name="pagina" value="paginaCliente">
           <input type="submit" class="removerCarrinho" value="Remover do carrinho" >
         </form>
                               
@@ -91,8 +105,41 @@
        
       </div>
     
+      <div id="formulario_senha">
+
+        <form action="/mudar_senha" method="post" id="formMudarSenha">
+          <label for="novaSenha">Nova Senha:</label>
+          <input type="password" name="novaSenha" id="novaSenha" placeholder="Digite sua nova senha" required>
+          <label for="repetirNovaSenha">Repetir Nova Senha</label>
+          <input type="password" name="repetirNovaSenha" id="repetirNovaSenha" placeholder="Repetir Nova Senha" required>
+          <input type="hidden" name="dadosUsuario" value="{{dadosCliente}}">
+          <div id="mensagemErroSenha"></div>
+          <input type="submit" value="Salvar">
+        </form>
+
+      </div>
 
 
+
+
+
+      <div id="modal_apagarConta" class="modal_apagarConta">
+        <div class="modal-content">
+          <h4>Tem certeza que deseja apagar sua conta?</h4>
+          <p>Essa ação é permanente e não pode ser desfeita.</p>
+          <div class="modal-buttons">
+            <button id="cancelarApagarConta">Cancelar</button>
+            
+            <form action="/apagar_conta" method="post">
+              <input type="hidden" name="EmailUsuario" value="{{dadosCliente['email']}}">
+              
+              <input type="submit"  id="confirmarApagarConta" value="Confirmar">
+            </form>
+            
+          </div>
+        </div>
+      </div>
+      
 
 
     </main>
@@ -101,21 +148,57 @@
       <p>&copy; 2023 Marketplace de Produtos Artesanais Igor & Luiz</p>
     </footer>
     <script>
+const divProdutos = document.querySelector("#produtos");
+const titulo = document.querySelector("#titulo")
+const btnMudarSenha = document.querySelector("#escolha_formulario_senha");
+const divFormularioSenha = document.querySelector("#formulario_senha");
+const btnPedidos = document.querySelector("#meus_pedidos");
+
+
+
+btnPedidos.addEventListener("click", () => {
+divProdutos.style.display = "flex";
+divFormularioSenha.style.display = 'none';
+titulo.textContent = "Meu Carrinho";
+
+})
+
+btnMudarSenha.addEventListener("click", () => {
+  divFormularioSenha.style.display = 'flex';
+  divProdutos.style.display = "none";
+  titulo.textContent = "Mudar Senha";
+  
+})
+
+
+
+
       document.getElementById('finalizarCompra').addEventListener("click", function () {
         
         var modal = document.createElement("div");
         modal.classList.add("modal");
         modal.innerHTML = `
         <div class="modal-content">
-            <span class="close">&times;</span>
-            <form action="/finalizarCompra" method="post" enctype="multipart/form-data">
-              <H1>pague com a chave pix abaixo </H1>
+  <span class="close">&times;</span>
+  <form action="/finalizarCompra" method="post" enctype="multipart/form-data">
+    {% for artesao in  listaArtesao %}  
+          {% for artesao_id, valor in valor_recebido_por_vendedor.items() %}       
+            {% if artesao['id'] == artesao_id %}
+            <h2>Pagar para {{artesao['nome']}} o valor de R$ {{valor}}<br>chave pix: {{artesao['chavePIX']}} </h2>
+            <br><br>
               
-              <H2> asdasdasdasdasdasdasdasd </H2>
               
-              <input type="submit" class="close" value="PAGO">
-            </form>
-          </div>
+
+            {% endif %}
+          {% endfor %}
+          {% endfor %}
+
+
+
+    <input type="submit" class="close" value="PAGO">
+  </form>
+</div>
+
         
         `;
         document.body.appendChild(modal);
@@ -164,8 +247,22 @@
         });
       });
       
-          
+          // codigo para fazer aparecer o modal de confirmação de apagar a conta
+const apagarContaButton = document.querySelector('.apagar_conta');
+const modalApagarConta = document.querySelector('#modal_apagarConta');
+const cancelarButton = document.querySelector('#cancelarApagarConta');
+
+apagarContaButton.addEventListener('click', () => {
+  modalApagarConta.style.display = "block";
+});
+
+cancelarButton.addEventListener('click', () => {
+  modalApagarConta.style.display = "none";
+});
+
+
       </script>
+      
           <script src="/static/javascript/home.js"></script>
     <script src="{{ url_for('static', filename='javascript/home.js') }}"></script>
   </body>

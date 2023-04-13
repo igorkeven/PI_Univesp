@@ -170,8 +170,8 @@ def cliente():
                     # passa as informações para o template HTML
                     return render_template('html/cliente.html', nome=nome, foto=foto,listaArtesao=listaArtesao , valor_recebido_por_vendedor=valor_recebido_por_vendedor,dadosCliente=dadosCliente)
 
-                else:
-                    return redirect('/login')
+    else:
+        return redirect('/login')
 
 
 
@@ -201,7 +201,9 @@ def acessoCliente():
         for cliente in listaCliente:  # loop para separar os dados 
             cont +=1
             if email == cliente['email'] and senha == cliente['senha']:#verificação se os dados escrito pelo usuario são iguais os salvos 
+                
                 return redirect('/cliente')
+
             if cont >= len(listaCliente):
                 flash('Email ou senha incorretos')
                 return redirect('/login')
@@ -213,7 +215,9 @@ def acessoCliente():
 # acesso a pagina do artesão onde ele fara upload dos artesanatos
 @app.route('/artesao')
 def artesao():
+    
     if 'artesaoLogado' in session: # Verifica se a chave 'nomeUsuarioLogado' está presente na sessão
+        
         email = session['artesaoLogado'] 
         with open('artesao.json') as TodosArtesao:  # abertura do arquivo JSON
             listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
@@ -468,19 +472,21 @@ def enviar_email(destinatario, senha):
 @app.route('/enviarEmail', methods=['POST'])
 def enviarEmail():
     email = request.form.get('emailArtesao')
+    
     with open('artesao.json' and 'clientes.json') as clientesEartesao:  # abertura do arquivo JSON
         listaCadastrados = json.load(clientesEartesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
-
+    
         for usuario in listaCadastrados:  # loop para separar os dados 
+            
 
-            if email == usuario['nome'] :#verificação se os dados escrito pelo usuario são iguais os salvos 
+            if email == usuario['email'] :#verificação se os dados escrito pelo usuario são iguais os salvos 
                 enviar_email(email, usuario['senha'])
                 flash(f'Senha enviada para seu Email {email} ')
                 return redirect('/esqueceuSenha') # codigo para enviar o email com a senha
 
             else:
                 flash('Email não cadastrado')
-                return redirect('/cadastro')
+                return redirect('/cadastrar')
 
 
     
@@ -594,7 +600,8 @@ def cadastrarCliente():
         "senha": senha,
         "id": id ,
         "foto": "",
-        "carrinho": {}
+        "carrinho": {},
+        "total_preco": 0.0
         }
         ] # a foto de perfil sempre inicia vazia, depois o usuario pode adicionar uma...
     novaListaCliente = listaCliente + user # concatenando todos usuarios ja salvos com o novo e colocando em uma variavel

@@ -23,7 +23,6 @@ def logout():
 
 
 
-
 # acesso a pagina inicial
 @app.route("/")
 def index():
@@ -38,14 +37,17 @@ def index():
         btnCompra = 'Adicionar no Carrinho'
         rotaCompra = '/adicionarCarrinho'
         logado = True
+        usuarioLogado = session['clienteLogado']
     else:
         carrinho = 'Faça Login'
         rotaCarrinho = '/login'
         btnCompra = 'Faça login para comprar'
         rotaCompra = '/login'
+        usuarioLogado =''
         logado = False
 
-    return render_template('html/home.html',usuarios=usuarios,artesao=listaArtesao,carrinho=carrinho,rotaCarrinho=rotaCarrinho,btnCompra=btnCompra,rotaCompra=rotaCompra,logado=logado)
+    return render_template('html/home.html',usuarioLogado=usuarioLogado,usuarios=usuarios,artesao=listaArtesao,carrinho=carrinho,rotaCarrinho=rotaCarrinho,btnCompra=btnCompra,rotaCompra=rotaCompra,logado=logado)
+
 
 
 @app.route('/adicionarCarrinho', methods=['POST'])
@@ -96,27 +98,28 @@ def adicionarCarrinho():
 @app.route('/excluirItemCarrinho', methods=['POST'])
 def excluirItemCarrinho():
     nome_produto = request.form.get('nome_produto')
-    id_vendedor = request.form.get('id_vendedor')
+    id_vendedor = int(request.form.get('id_vendedor'))
     pagina = request.form.get('pagina')
     with open('clientes.json') as f:
         usuarios = json.load(f)
-
+    
     # Encontrar o usuário correto pelo seu ID
-    for usuario in usuarios:
-         if usuario['carrinho'][nome_produto] :
-            # Subtrair o valor do item do total_preco
-            usuario['total_preco'] -= usuario['carrinho'][nome_produto]['preco'] 
-            
-            # Verificar se a quantidade é maior que 1 antes de subtrair
-            if usuario['carrinho'][nome_produto]['quantidade'] > 1:
-                usuario['carrinho'][nome_produto]['quantidade'] -= 1
-            else:
-                del usuario['carrinho'][nome_produto]  # Se a quantidade for 1, remover o produto do carrinho
-            
-            # Salvar o conteúdo atualizado de volta no arquivo JSON
-            with open('clientes.json', 'w') as f:
-                json.dump(usuarios, f, indent=4)
-            break  # sair do loop depois de encontrar o usuário correto
+        for usuario in usuarios:
+            if id_vendedor == usuario['id']:
+                if usuario['carrinho'][nome_produto] :
+                    # Subtrair o valor do item do total_preco
+                    usuario['total_preco'] -= usuario['carrinho'][nome_produto]['preco'] 
+                    
+                    # Verificar se a quantidade é maior que 1 antes de subtrair
+                    if usuario['carrinho'][nome_produto]['quantidade'] > 1:
+                        usuario['carrinho'][nome_produto]['quantidade'] -= 1
+                    else:
+                        del usuario['carrinho'][nome_produto]  # Se a quantidade for 1, remover o produto do carrinho
+                    
+                    # Salvar o conteúdo atualizado de volta no arquivo JSON
+                    with open('clientes.json', 'w') as f:
+                        json.dump(usuarios, f, indent=4)
+                    break  # sair do loop depois de encontrar o usuário correto
 
     if pagina == 'paginaCliente':
         return redirect('/cliente')

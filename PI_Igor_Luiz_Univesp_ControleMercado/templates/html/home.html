@@ -66,23 +66,21 @@
               <input type="hidden" name="id_vendedor" value="{{artesao1['id']}}">
               <input type="hidden" name="pagina" value="paginaInicial">
               
-              {% if rotaCompra == '/adicionarCarrinho' %}
-              {% for usuario in usuarios %}
-                  {% if usuario['carrinho']  %}
-                  
-                      {% if usuario['carrinho'].get(produto) is not none %}
-                          
-                          <input type="submit" value="{{produto}} no carrinho&#10;quantidade: {{usuario['carrinho'][produto]['quantidade']}}&#10;Adicionar + 1" >
-                
 
-                      {% else %}
-                          <input type="submit" value="{{btnCompra}}">
-                      {% endif %}
-                  {% endif %}
-              {% endfor %}
+              {% if logado == True %}
+                {% for usuario in usuarios %}
+                    {% if usuarioLogado == usuario['email'] %}
+                          {% if produto in usuario['carrinho'] %}
+                          <input type="submit" value="{{produto}} no carrinho&#10;quantidade: {{usuario['carrinho'][produto]['quantidade']}} &#10;Adicionar + 1" >
+                          {% else %}
+                            <input type="submit" value="{{btnCompra}}">
+                          {% endif %}
+                    {% endif %}
+                {% endfor %}
               {% else %}
-              <input type="submit" value="{{btnCompra}}">
+                      <input type="submit" value="{{btnCompra}}">
               {% endif %}
+              
           </form>
           <br>
           {% if rotaCompra == '/adicionarCarrinho' %}

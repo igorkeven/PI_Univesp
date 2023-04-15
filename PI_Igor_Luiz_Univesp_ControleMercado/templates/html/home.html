@@ -31,7 +31,7 @@
         <section id="busca">
             <h2>Pesquisar Produtos</h2>
             <form>
-              <input type="text" placeholder="Pesquisar por nome, categoria ou palavra-chave">
+              <input type="text" id="campo-busca" placeholder="Pesquisar por nome, categoria ou palavra-chave">
               <button type="submit">Buscar</button>
             </form>
           </section>
@@ -90,8 +90,8 @@
 
           <form action="/excluirItemCarrinho" method="post">
             <input type="hidden" name="nome_produto" value="{{produto}}">
-            <input type="hidden" name="id_vendedor" value="{{artesao1['id']}}">
-
+            
+            <input type="hidden" name="emailCliente" value="{{usuario['email']}}">
             <input type="submit" class="removerCarrinho" value="Remover do carrinho" >
           </form>
                                 
@@ -115,11 +115,32 @@
       <p>&copy; 2023 Marketplace de Produtos Artesanais Igor & Luiz</p>
     </footer>
 <script>
-    
+
+
+
+
+const campoBusca = document.querySelector('#campo-busca');
+const todosProdutos = document.querySelector('#produtos');
+
+campoBusca.addEventListener('input', () => {
+  const termoBusca = campoBusca.value.trim().toLowerCase();
+  const produtosFiltrados = Array.from(todosProdutos.querySelectorAll('.produto')).filter(produto => {
+    const nomeProduto = produto.querySelector('h2').textContent.toLowerCase();
+    const descricaoProduto = produto.querySelector('p').textContent.toLowerCase();
+    return nomeProduto.includes(termoBusca) || descricaoProduto.includes(termoBusca);
+  });
+  todosProdutos.innerHTML = '';
+  produtosFiltrados.forEach(produto => {
+    todosProdutos.appendChild(produto);
+  });
+});
+
+
+
 </script>
     <script src="/static/javascript/home.js"></script>
-    <script src="/static/javascript/busca.js"></script>
-    <script src="{{ url_for('static', filename='javascript/busca.js') }}"></script>
+    <!-- <script src="/static/javascript/busca.js"></script>
+    <script src="{{ url_for('static', filename='javascript/busca.js') }}"></script> -->
     <script src="{{ url_for('static', filename='javascript/home.js') }}"></script>
   </body>
 </html>

@@ -50,11 +50,13 @@
         {% endif %}
         <h3 class="menu_perfil"  id="escolha_formulario_senha" >Mudar senha</h3>
         <h3 class="menu_perfil" >Historico de compras</h3>
+        <h3 class="menu_perfil" id="paginainicial" >Ir as compras</h3>
         {% if dadosCliente['carrinho']  %}
         <h3 class="menu_perfil" id="meus_pedidos" > Meus Pedidos  </h3>
-        {% endif %}
+        
         <h3  > Total a pagar: {{dadosCliente['total_preco']}}</h3>
         <h3 class="menu_perfil" id="finalizarCompra">Finalizar compra</h3>
+        {% endif %}
         <h3 class="apagar_conta" >Apagar minha conta</h3>
       </aside>
       
@@ -92,8 +94,9 @@
 
         <form action="/excluirItemCarrinho" method="post">
           <input type="hidden" name="nome_produto" value="{{produto}}">
-          <input type="hidden" name="id_vendedor" value="{{dados['id_vendedor']}}">
+          
           <input type="hidden" name="pagina" value="paginaCliente">
+          <input type="hidden" name="emailCliente" value="{{dadosCliente['email']}}">
           <input type="submit" class="removerCarrinho" value="Remover do carrinho" >
         </form>
                               
@@ -150,6 +153,16 @@
       <p>&copy; 2023 Marketplace de Produtos Artesanais Igor & Luiz</p>
     </footer>
     <script>
+const irCompras = document.querySelector("#paginainicial")
+
+
+irCompras.addEventListener("click", () => {
+  window.location.href = "/";
+})
+
+
+
+
 const divProdutos = document.querySelector("#produtos");
 const titulo = document.querySelector("#titulo")
 const btnMudarSenha = document.querySelector("#escolha_formulario_senha");
@@ -194,9 +207,9 @@ btnMudarSenha.addEventListener("click", () => {
             {% endif %}
           {% endfor %}
           {% endfor %}
+          
 
-
-
+    <input type="hidden" name="dadosCliente" value="{{dadosCliente }}" >
     <input type="submit" class="close" value="PAGO">
   </form>
 </div>

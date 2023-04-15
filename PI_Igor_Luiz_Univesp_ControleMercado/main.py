@@ -7,6 +7,15 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import os
 from werkzeug.utils import secure_filename
+from datetime import date, time, datetime, timedelta
+
+
+
+
+
+data = datetime.today()
+datahoje = data.strftime("%Y-%m-%d %H:%M:%S")
+
 
 
 app = Flask(__name__)
@@ -97,15 +106,15 @@ def adicionarCarrinho():
 
 @app.route('/excluirItemCarrinho', methods=['POST'])
 def excluirItemCarrinho():
+    email = request.form.get('emailCliente')
     nome_produto = request.form.get('nome_produto')
-    id_vendedor = int(request.form.get('id_vendedor'))
     pagina = request.form.get('pagina')
     with open('clientes.json') as f:
         usuarios = json.load(f)
     
     # Encontrar o usuário correto pelo seu ID
         for usuario in usuarios:
-            if id_vendedor == usuario['id']:
+            if email == usuario['email']:
                 if usuario['carrinho'][nome_produto] :
                     # Subtrair o valor do item do total_preco
                     usuario['total_preco'] -= usuario['carrinho'][nome_produto]['preco'] 
@@ -128,6 +137,53 @@ def excluirItemCarrinho():
 
 
 
+# finalizar compra e guardar dados no historico
+@app.route('/finalizarCompra', methods=['POST'])
+def finalizarCompra():
+    
+    dados_usuario_str = request.form.get('dadosCliente') 
+    dados_usuario_str = dados_usuario_str.replace("'", "\"")
+    dados_usuario = json.loads(dados_usuario_str)
+    print(dados_usuario['email'])
+
+    with open('clientes.json') as f:
+        clientes = json.load(f)
+        for usuario in clientes:
+            print(usuario['email'])
+            if usuario['email'] == dados_usuario['email']:
+                
+                if len(usuario['historico']) > 0:
+                    usuario['historico'].append({
+                        "compras_finalizadas": usuario['carrinho'],
+                        "compra_feita_em": datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+                    })
+                else:
+                    usuario['historico'] = [{
+                        "compras_finalizadas": usuario['carrinho'],
+                        "compra_feita_em": datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+                    }]
+                usuario['carrinho'] = {}
+                usuario['total_preco'] = 0.0
+
+                with open('clientes.json', 'w') as f:
+                    json.dump(clientes, f, indent=4)
+                break  # sair do loop depois de encontrar o usuário correto
+    with open('artesao.json') as g:
+        artesoes = json.load(g)
+        for artesao in artesoes:
+            
+            
+                
+                for nome_produto, produto in dados_usuario['carrinho'].items():
+                        if produto['id_vendedor'] == artesao['id']:
+                            artesao_produtos = artesao['produtos']
+                            artesao_produtos[nome_produto]['quantidade_vendida'] += produto['quantidade']
+
+
+                with open('artesao.json', 'w') as f:
+                    json.dump(artesoes, f, indent=4)
+
+    return redirect('/cliente')
 
 
 
@@ -273,7 +329,7 @@ def novo_produto():
     descricao = request.form.get('descricao')
     dados_usuario_str = request.form.get('dadosUsuario') 
     dados_usuario_str = dados_usuario_str.replace("'", "\"")
-    print(f"dados_usuario_str: {dados_usuario_str}")
+    #print(f"dados_usuario_str: {dados_usuario_str}")
     dados_usuario = json.loads(dados_usuario_str)
     nome_arquivo = secure_filename(foto.filename) # obtém a extensão do arquivo carregado e adiciona ao nome do arquivo
     nome_arquivo = f"fotoProduto_{dados_usuario['nome']}_id_{dados_usuario['id']}_{nome_produto}"
@@ -291,6 +347,7 @@ def novo_produto():
                 'imagem': nome_arquivo,
                 'descricao': descricao,
                 'preco': float(preco),
+                "quantidade_vendida": 0
             }
 
     with open('artesao.json', 'w') as arq:
@@ -301,7 +358,7 @@ def novo_produto():
 
 
 
-
+# edição do nome, preço e descrição do produto
 @app.route('/editar_produto', methods=['POST'])
 def editar_produto():
     # Recebe os dados do formulário enviado
@@ -370,6 +427,15 @@ def excluir_produto():
 
     # Redireciona o usuário para a página principal
     return redirect('/artesao')
+
+
+
+
+
+
+
+
+
 
 #mudar senha artesão
 @app.route('/mudar_senha', methods=['POST'])
@@ -604,7 +670,8 @@ def cadastrarCliente():
         "id": id ,
         "foto": "",
         "carrinho": {},
-        "total_preco": 0.0
+        "total_preco": 0.0,
+        "historico":{}
         }
         ] # a foto de perfil sempre inicia vazia, depois o usuario pode adicionar uma...
     novaListaCliente = listaCliente + user # concatenando todos usuarios ja salvos com o novo e colocando em uma variavel

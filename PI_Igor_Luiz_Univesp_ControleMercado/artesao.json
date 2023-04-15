@@ -7,10 +7,23 @@
         "id": 1,
         "foto": "",
         "produtos": {
-            "banana ma\u00e7\u00e3": {
-                "imagem": "fotoProduto_igor Keven_id_1_banana ma\u00e7\u00e3.jpg",
-                "descricao": "um pouco de banana ma\u00e7\u00e3",
-                "preco": 145.0
+            "bolsas de fibra de banana": {
+                "imagem": "fotoProduto_igor Keven_id_1_bolsas de fibra de banana.jpg",
+                "descricao": "bolsas feitas com fibra de banana, 129 reais cada",
+                "preco": 129.0,
+                "quantidade_vendida": 10
+            },
+            "cesta para ovos": {
+                "imagem": "fotoProduto_igor Keven_id_1_cesta para ovos.jpg",
+                "descricao": "cesta para ovos feita com fibra de banana, R$25 cada",
+                "preco": 25.0,
+                "quantidade_vendida": 1
+            },
+            "cesto para roupas": {
+                "imagem": "fotoProduto_igor Keven_id_1_cesto para roupas.jpg",
+                "descricao": "cesto para roupas feito com fibras de banana, R$100 cada",
+                "preco": 100.0,
+                "quantidade_vendida": 10
             }
         }
     },
@@ -21,13 +34,7 @@
         "chavePIX": "123456789",
         "id": 2,
         "foto": "",
-        "produtos": {
-            "banana prata": {
-                "imagem": "fotoProduto_luiz_id_2_banana prata.jpg",
-                "descricao": "um pouco de banana prata",
-                "preco": 45.0
-            }
-        }
+        "produtos": {}
     },
     {
         "email": "teste2@teste.com",

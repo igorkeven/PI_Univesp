@@ -5,10 +5,9 @@
         "senha": "123",
         "id": 1,
         "foto": "",
-        "carrinho": {
-            
-        },
-        "total_preco": 0.0
+        "carrinho": {},
+        "total_preco": 0.0,
+        "historico": {}
     },
     {
         "nome": "Luiz Eduardo",
@@ -17,7 +16,40 @@
         "id": 2,
         "foto": "",
         "carrinho": {},
-        "total_preco": 0.0
+        "total_preco": 0.0,
+        "historico": [
+            {
+                "compras_finalizadas": {
+                    "bolsas de fibra de banana": {
+                        "imagem": "fotoProduto_igor Keven_id_1_bolsas de fibra de banana.jpg",
+                        "descricao": "bolsas feitas com fibra de banana, 129 reais cada",
+                        "preco": 129.0,
+                        "id_vendedor": 1,
+                        "quantidade": 1
+                    },
+                    "cesto para roupas": {
+                        "imagem": "fotoProduto_igor Keven_id_1_cesto para roupas.jpg",
+                        "descricao": "cesto para roupas feito com fibras de banana, R$100 cada",
+                        "preco": 100.0,
+                        "id_vendedor": 1,
+                        "quantidade": 1
+                    }
+                },
+                "compra_feita_em": "2023-04-15 18:34:29"
+            },
+            {
+                "compras_finalizadas": {
+                    "cesta para ovos": {
+                        "imagem": "fotoProduto_igor Keven_id_1_cesta para ovos.jpg",
+                        "descricao": "cesta para ovos feita com fibra de banana, R$25 cada",
+                        "preco": 25.0,
+                        "id_vendedor": 1,
+                        "quantidade": 1
+                    }
+                },
+                "compra_feita_em": "2023-04-15 18:35:18"
+            }
+        ]
     },
     {
         "nome": "igor 2",
@@ -26,7 +58,8 @@
         "id": 3,
         "foto": "",
         "carrinho": {},
-        "total_preco": 0.0
+        "total_preco": 0.0,
+        "historico": {}
     },
     {
         "nome": "teste 3",
@@ -35,6 +68,7 @@
         "id": 4,
         "foto": "",
         "carrinho": {},
-        "total_preco": 0.0
+        "total_preco": 0.0,
+        "historico": {}
     }
 ]

@@ -5,6 +5,12 @@
 
 
 
+
+.apagarAlerta{
+  color: red;
+  font-weight: bold;
+}
+
 #alerta{
   margin-left: 20%;
   

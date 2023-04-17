@@ -54,8 +54,23 @@ def index():
         rotaCompra = '/login'
         usuarioLogado =''
         logado = False
+    # produtos em destaque
 
-    return render_template('html/home.html',usuarioLogado=usuarioLogado,usuarios=usuarios,artesao=listaArtesao,carrinho=carrinho,rotaCarrinho=rotaCarrinho,btnCompra=btnCompra,rotaCompra=rotaCompra,logado=logado)
+    produtos_destaque = []
+    quantidades = []
+    for artesao in listaArtesao:
+       
+        if artesao['produtos']:
+            for produto, dados in artesao['produtos'].items():
+                quantidades.append(dados['quantidade_vendida'])
+                
+    # ordenar a lista de quantidades em ordem decrescente
+    quantidades_ordenadas = sorted(quantidades, reverse=True)   
+    # selecionar os 4 primeiros elementos da lista ordenada
+    quantidades_selecionadas = quantidades_ordenadas[:3]
+
+
+    return render_template('html/home.html',quantidades_selecionadas=quantidades_selecionadas,usuarioLogado=usuarioLogado,usuarios=usuarios,artesao=listaArtesao,carrinho=carrinho,rotaCarrinho=rotaCarrinho,btnCompra=btnCompra,rotaCompra=rotaCompra,logado=logado)
 
 
 
@@ -363,32 +378,40 @@ def novo_produto():
 def editar_produto():
     # Recebe os dados do formulário enviado
     nome = request.form.get('editar_nome')
-    preco = request.form.get("editar_preco")
+    preco = int(request.form.get("editar_preco"))
     descricao = request.form.get("editar_descricao")
     produto_dados_str = request.form.get("editar_produto_dados")
     produto_dados_str = produto_dados_str.replace("'", "\"")
     produto_dados = json.loads(produto_dados_str)
     nomeAntigo = request.form.get('nomeAntigo')
-
+    print(nomeAntigo)
     # Carrega o arquivo JSON em memória
     with open('artesao.json', 'r') as f:
         data = json.load(f)
 
         for artesao in data:
+            
             if produto_dados['id'] == artesao['id']:
+                        
                 produtos = artesao['produtos']
                 produtos_chaves = list(produtos.keys())
                 index_antigo = produtos_chaves.index(nomeAntigo)
 
-                produtos[nome] = {
+                artesao['produtos'][nome] = {
                     "imagem": produtos[nomeAntigo]['imagem'],
                     "descricao": descricao,
-                    "preco": preco
+                    "preco": preco,
+                    "quantidade_vendida": artesao['produtos'][nomeAntigo]['quantidade_vendida']
                 }
-                produtos.pop(nomeAntigo)
-                produtos_chaves.pop(index_antigo)
-                produtos_chaves.insert(index_antigo, nome)
-                artesao['produtos'] = {chave: produtos[chave] for chave in produtos_chaves}
+                
+                if nomeAntigo != nome:
+                    produtos.pop(nomeAntigo)
+                    produtos_chaves.pop(index_antigo)
+
+
+                break
+                
+                        
 
     with open('artesao.json', 'w') as f:
         json.dump(data, f, indent=4)
@@ -572,6 +595,7 @@ def enviar_foto():
     
     # substitui as aspas simples por aspas duplas
     dadosUsuario_str = dadosUsuario_str.replace("'", "\"")
+    print(dadosUsuario_str)
     dadosUsuario = json.loads(dadosUsuario_str)
     nome_arquivo = f"fotoPerfil_{dadosUsuario['nome']}_id_{dadosUsuario['id']}"
     nome_arquivo = secure_filename(nome_arquivo) # obtém a extensão do arquivo carregado e adiciona ao nome do arquivo

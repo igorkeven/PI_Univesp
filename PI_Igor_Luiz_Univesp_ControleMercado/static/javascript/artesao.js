@@ -138,38 +138,3 @@ btnEnviarProdutos.addEventListener("click", () => {
 
 
 
-
-// codigo para aparecer o modal de envio de foto do perfil
-document.getElementById("foto-artesao").addEventListener("click", function() {
-  if (this.src.includes("usuario.png")) {
-    // Usuário ainda não tem uma imagem definida, permitir a mudança da imagem sem alerta
-  } else {
-    // Usuário já tem uma imagem definida, solicitar confirmação antes de permitir a mudança da imagem
-    if (confirm("Você tem certeza que deseja mudar sua foto?")) {
-      // Usuário confirmou a mudança da foto
-    } else {
-      // Usuário cancelou a mudança da foto
-      return;
-    }
-  }
-  var modal = document.createElement("div");
-  modal.classList.add("modal");
-  modal.innerHTML = `
-    <div class="modal-content">
-      <span class="close">&times;</span>
-      <form action="/enviar_foto" method="post" enctype="multipart/form-data">
-        <input type="file" name="foto" id="foto">
-        <input type="hidden" name="dadosUsuario" value="{{artesao}}" >
-        <input type="hidden" name="retornoRota" value="/artesao" >
-        
-        <input type="submit" value="Enviar">
-      </form>
-    </div>
-  `;
-  document.body.appendChild(modal);
-  
-  var closeButton = modal.querySelector(".close");
-  closeButton.addEventListener("click", function() {
-    modal.remove();
-  });
-});

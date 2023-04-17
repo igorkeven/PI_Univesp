@@ -22,8 +22,14 @@
       </nav>
           </header>
 
-
+          {% if dadosCliente['carrinho'] %}
           <h1 class="titulo" id="titulo">Seu carrinho</h1>
+          {% else %}
+          <h1 class="titulo" id="titulo">Seu carrinho esta Vazio</h1>
+          <h3 class="menu_perfil ir2" id="paginainicial2" >click aqui e vá as compras</h3>
+          {% endif %}
+          
+          
           {% set mensagens = get_flashed_messages() %}
           {% if mensagens %}
               <div id="alerta">
@@ -44,18 +50,19 @@
         {% else %}
         
           <img src="{{ url_for('static', filename='fotoPerfil/' + foto) }}" width="200" height="150" alt="Foto do artesão {{ nome }}" title="Mudar foto" id="foto-artesao">
-       
+          
+          {% set menu_perfil_style = 'font-size: 18px;' %}
         <br>
         <h1 class="nome"> {{ nome }} </h1>
         {% endif %}
-        <h3 class="menu_perfil"  id="escolha_formulario_senha" >Mudar senha</h3>
-        <h3 class="menu_perfil" >Historico de compras</h3>
-        <h3 class="menu_perfil" id="paginainicial" >Ir as compras</h3>
+        <h3 class="menu_perfil"  id="escolha_formulario_senha" style="{{ menu_perfil_style|default('') }}" >Mudar senha</h3>
+        <h3 class="menu_perfil" id="btnhistorico" style="{{ menu_perfil_style|default('') }}" >Historico de compras</h3>
+        <h3 class="menu_perfil" id="paginainicial" style="{{ menu_perfil_style|default('') }}" >Ir as compras</h3>
         {% if dadosCliente['carrinho']  %}
-        <h3 class="menu_perfil" id="meus_pedidos" > Meus Pedidos  </h3>
+        <h3 class="menu_perfil" id="meus_pedidos" style="{{ menu_perfil_style|default('') }}" > Meus Pedidos  </h3>
         
         <h3  > Total a pagar: {{dadosCliente['total_preco']}}</h3>
-        <h3 class="menu_perfil" id="finalizarCompra">Finalizar compra</h3>
+        <h3 class="menu_perfil" id="finalizarCompra" style="{{ menu_perfil_style|default('') }}">Finalizar compra</h3>
         {% endif %}
         <h3 class="apagar_conta" >Apagar minha conta</h3>
       </aside>
@@ -106,6 +113,8 @@
 
 
         {% endfor %}
+        
+
         {% endif %}
        
       </div>
@@ -131,7 +140,7 @@
       <div id="modal_apagarConta" class="modal_apagarConta">
         <div class="modal-content">
           <h4>Tem certeza que deseja apagar sua conta?</h4>
-          <p>Essa ação é permanente e não pode ser desfeita.</p>
+          <p class="apagarAlerta">Essa ação é permanente e não pode ser desfeita.</p>
           <div class="modal-buttons">
             <button id="cancelarApagarConta">Cancelar</button>
             
@@ -147,13 +156,58 @@
       
 
 
+      <div class="historico" id="historico">
+        {% if dadosCliente['historico'] %}
+          {% for compra in dadosCliente['historico'] %}
+            <h2 class="compra-realizada">Compra realizada em {{ compra['compra_feita_em'] }}</h2>
+            {% for produto, dados in compra['compras_finalizadas'].items() %}
+              <div class="produto">
+                <img src="{{ url_for('static', filename='produtos/' + dados['imagem']) }}" alt="{{ produto }}" width="200">
+                <h3>{{ produto }}</h3>
+                <p>{{ dados['descricao'] }}</p>
+                <p>Preço: R$ {{ dados['preco'] }}</p>
+                {% for artesao in listaArtesao %}
+                  {% if dados['id_vendedor'] == artesao['id'] %}
+                    <p>Vendedor: {{ artesao['nome'] }}</p>
+                  {% endif %}
+                {% endfor %}
+                <p>Quantidade: {{ dados['quantidade'] }}</p>
+              </div>
+            {% endfor %}
+          {% endfor %}
+        {% else %}
+          <p>Nenhum histórico de compras encontrado.</p>
+        {% endif %}
+      </div>
+      
+      
+
+
+
+
     </main>
      
     <footer>
       <p>&copy; 2023 Marketplace de Produtos Artesanais Igor & Luiz</p>
     </footer>
     <script>
-const irCompras = document.querySelector("#paginainicial")
+const irCompras = document.querySelector("#paginainicial");
+const irCompras2 = document.querySelector("#paginainicial2");
+const divProdutos = document.querySelector("#produtos");
+const titulo = document.querySelector("#titulo");
+const btnMudarSenha = document.querySelector("#escolha_formulario_senha");
+const divFormularioSenha = document.querySelector("#formulario_senha");
+const btnPedidos = document.querySelector("#meus_pedidos");
+const historico = document.querySelector("#historico");
+const btnhistorico = document.querySelector("#btnhistorico");
+          // codigo para fazer aparecer o modal de confirmação de apagar a conta
+const apagarContaButton = document.querySelector('.apagar_conta');
+const modalApagarConta = document.querySelector('#modal_apagarConta');
+const cancelarButton = document.querySelector('#cancelarApagarConta');
+
+
+
+
 
 
 irCompras.addEventListener("click", () => {
@@ -161,34 +215,39 @@ irCompras.addEventListener("click", () => {
 })
 
 
+if (titulo.textContent === "Seu carrinho esta Vazio") {
+  irCompras2.addEventListener("click", () => {
+    window.location.href = "/";
+  });
+}
 
 
-const divProdutos = document.querySelector("#produtos");
-const titulo = document.querySelector("#titulo")
-const btnMudarSenha = document.querySelector("#escolha_formulario_senha");
-const divFormularioSenha = document.querySelector("#formulario_senha");
-const btnPedidos = document.querySelector("#meus_pedidos");
+
+
+btnhistorico.addEventListener("click", () => {
+historico.style.display = 'block';
+divProdutos.style.display = "none";
+divFormularioSenha.style.display = 'none';
+titulo.textContent = "Meu Historico de compras";
+
+})
 
 
 
+
+if (titulo.textContent === "Seu carrinho") {
 btnPedidos.addEventListener("click", () => {
 divProdutos.style.display = "flex";
 divFormularioSenha.style.display = 'none';
+historico.style.display = 'none';
 titulo.textContent = "Meu Carrinho";
 
 })
 
-btnMudarSenha.addEventListener("click", () => {
-  divFormularioSenha.style.display = 'flex';
-  divProdutos.style.display = "none";
-  titulo.textContent = "Mudar Senha";
-  
-})
 
 
 
-
-      document.getElementById('finalizarCompra').addEventListener("click", function () {
+document.getElementById('finalizarCompra').addEventListener("click", function () {
         
         var modal = document.createElement("div");
         modal.classList.add("modal");
@@ -202,8 +261,6 @@ btnMudarSenha.addEventListener("click", () => {
             <h2>Pagar para {{artesao['nome']}} o valor de R$ {{valor}}<br>chave pix: {{artesao['chavePIX']}} </h2>
             <br><br>
               
-              
-
             {% endif %}
           {% endfor %}
           {% endfor %}
@@ -227,6 +284,21 @@ btnMudarSenha.addEventListener("click", () => {
       })
   
 
+  } 
+
+
+
+btnMudarSenha.addEventListener("click", () => {
+  divFormularioSenha.style.display = 'flex';
+  divProdutos.style.display = "none";
+  historico.style.display = 'none';
+  titulo.textContent = "Mudar Senha";
+  
+})
+
+
+
+
       document.getElementById("foto-artesao").addEventListener("click", function() {
         if (this.src.includes("usuario.png")) {
           // Usuário ainda não tem uma imagem definida, permitir a mudança da imagem sem alerta
@@ -245,7 +317,7 @@ btnMudarSenha.addEventListener("click", () => {
           <div class="modal-content">
             <span class="close">&times;</span>
             <form action="/enviar_foto" method="post" enctype="multipart/form-data">
-              <input type="file" name="foto" id="foto">
+              <input type="file" name="foto" id="foto" required>
               <input type="hidden" name="dadosUsuario" value="{{dadosCliente}}" >
               <input type="hidden" name="retornoRota" value="/cliente" >
               
@@ -262,10 +334,6 @@ btnMudarSenha.addEventListener("click", () => {
         });
       });
       
-          // codigo para fazer aparecer o modal de confirmação de apagar a conta
-const apagarContaButton = document.querySelector('.apagar_conta');
-const modalApagarConta = document.querySelector('#modal_apagarConta');
-const cancelarButton = document.querySelector('#cancelarApagarConta');
 
 apagarContaButton.addEventListener('click', () => {
   modalApagarConta.style.display = "block";

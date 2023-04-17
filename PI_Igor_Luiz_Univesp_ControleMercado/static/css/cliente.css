@@ -3,3 +3,58 @@
 
 @import url(/static/css/artesao.css);
 
+
+.ir2{
+    background-color: #007bff;
+}
+
+
+
+.seu_carrinho_vazio, .ir2 {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 5% 25%;
+    justify-content: center;
+
+}
+
+
+#historico {
+    display: none;
+    margin: 5% 20%;
+}
+
+  
+  #historico .produto {
+    
+    margin-bottom: 80px;
+    padding: 20px;
+    border: 2px solid black;
+    width: calc(25% - 20px);
+    display: inline-block;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  
+  #historico .produto img {
+    margin-bottom: 10px;
+  }
+  
+  #historico .produto h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  #historico .produto p {
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+
+  .compra-realizada {
+    display: flex;
+    
+    justify-content: center;
+    
+  }
+  

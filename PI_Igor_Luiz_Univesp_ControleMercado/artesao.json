@@ -5,25 +5,25 @@
         "nome": "igor Keven",
         "chavePIX": "chavepixdoigor",
         "id": 1,
-        "foto": "",
+        "foto": "fotoPerfil_igor_Keven_id_1.jpg",
         "produtos": {
-            "bolsas de fibra de banana": {
-                "imagem": "fotoProduto_igor Keven_id_1_bolsas de fibra de banana.jpg",
-                "descricao": "bolsas feitas com fibra de banana, 129 reais cada",
-                "preco": 129.0,
-                "quantidade_vendida": 10
-            },
-            "cesta para ovos": {
-                "imagem": "fotoProduto_igor Keven_id_1_cesta para ovos.jpg",
-                "descricao": "cesta para ovos feita com fibra de banana, R$25 cada",
-                "preco": 25.0,
-                "quantidade_vendida": 1
-            },
             "cesto para roupas": {
                 "imagem": "fotoProduto_igor Keven_id_1_cesto para roupas.jpg",
                 "descricao": "cesto para roupas feito com fibras de banana, R$100 cada",
-                "preco": 100.0,
-                "quantidade_vendida": 10
+                "preco": 1,
+                "quantidade_vendida": 12
+            },
+            "cesta para ovos grandes": {
+                "imagem": "fotoProduto_igor Keven_id_1_cesta para ovos.jpg",
+                "descricao": "cesta para ovos feita com fibra de banana, R$25 cada",
+                "preco": 25,
+                "quantidade_vendida": 14
+            },
+            "banana ma\u00e7\u00e3": {
+                "imagem": "fotoProduto_igor Keven_id_1_banana ma\u00e7\u00e3.jpg",
+                "descricao": "banana do tipo ma\u00e7\u00e3",
+                "preco": 150.0,
+                "quantidade_vendida": 0
             }
         }
     },
@@ -34,7 +34,14 @@
         "chavePIX": "123456789",
         "id": 2,
         "foto": "",
-        "produtos": {}
+        "produtos": {
+            "banana nanica": {
+                "imagem": "fotoProduto_luiz_id_2_banana nanica.jpg",
+                "descricao": "banana do tipo nanica",
+                "preco": "100",
+                "quantidade_vendida": 2
+            }
+        }
     },
     {
         "email": "teste2@teste.com",
@@ -44,21 +51,5 @@
         "id": 5,
         "foto": "",
         "produtos": {}
-    },
-    {
-        "email": "teste3@teste.com",
-        "senha": "123",
-        "nome": "teste 3",
-        "chavePIX": "123",
-        "id": 6,
-        "foto": ""
-    },
-    {
-        "email": "teste4@teste.com",
-        "senha": "123",
-        "nome": "teste 4",
-        "chavePIX": "chaveteste4321",
-        "id": 7,
-        "foto": ""
     }
 ]

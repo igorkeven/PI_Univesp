@@ -36,10 +36,87 @@
             </form>
           </section>
     
-      <section id="destaque">
-        <h1>Produtos em Destaque</h1>
+      <section id="destaque" id="destaque">
+        <h1>Produtos em Destaque mais vendidos</h1>
         <div class="produtos">
           <!-- aqui colocamos os produtos em destaque -->
+
+
+
+
+
+          {% for artesao1 in artesao %}
+          {% if artesao1['produtos'] %}
+          {% for produto, dados in artesao1['produtos'].items() %}
+          {% if dados['quantidade_vendida'] in quantidades_selecionadas: %}
+          <div class="produto{% if loop.index % 4 == 0 %} ultima{% endif %}">
+            <img src="{{ url_for('static', filename='produtos/' + dados['imagem']) }}" alt="{{ produto }}" width="200">
+            <h2>{{ produto }}</h2>
+            <p>{{ dados['descricao'] }}</p>
+            <p> quantidade vendida: {{ dados['quantidade_vendida']  }}</p>
+            <p>Preço: R$ {{ dados['preco'] }}</p>
+            <p>vendedor: {{ artesao1['nome'] }}</p>
+            
+          
+
+            <form action="{{rotaCompra}}" method="{% if rotaCompra == '/adicionarCarrinho' %}POST{% else %}GET{% endif %}">
+              <input type="hidden" name="imagem" value="{{ dados['imagem'] }}">
+              <input type="hidden" name="descricao" value="{{ dados['descricao'] }}">
+              <input type="hidden" name="preco" value="{{ dados['preco'] }}">
+              <input type="hidden" name="nome_produto" value="{{produto}}">
+              <input type="hidden" name="id_vendedor" value="{{artesao1['id']}}">
+              <input type="hidden" name="pagina" value="paginaInicial">
+              
+
+              {% if logado == True %}
+                {% for usuario in usuarios %}
+                    {% if usuarioLogado == usuario['email'] %}
+                          {% if produto in usuario['carrinho'] %}
+                          <input type="submit" value="{{produto}} no carrinho&#10;quantidade: {{usuario['carrinho'][produto]['quantidade']}} &#10;Adicionar + 1" >
+                          {% else %}
+                            <input type="submit" value="{{btnCompra}}">
+                          {% endif %}
+                    {% endif %}
+                {% endfor %}
+              {% else %}
+                      <input type="submit" value="{{btnCompra}}">
+              {% endif %}
+              
+          </form>
+          <br>
+          {% if rotaCompra == '/adicionarCarrinho' %}
+          {% for usuario in usuarios %}
+          {% if usuario['carrinho'] %}
+              {% if usuario['carrinho'].get(produto) is not none %}
+
+          <form action="/excluirItemCarrinho" method="post">
+            <input type="hidden" name="nome_produto" value="{{produto}}">
+            
+            <input type="hidden" name="emailCliente" value="{{usuario['email']}}">
+            <input type="submit" class="removerCarrinho" value="Remover do carrinho" >
+          </form>
+                                
+          {% endif %}
+          {% endif %}
+      {% endfor %}
+          {% endif %}
+
+            <br>
+          </div>
+          {% endif %}
+          {% endfor %}
+          {% endif %}
+          {% endfor %}
+
+
+
+
+
+                  <!--     fim dos produtos em destaque -->
+
+
+
+
         </div>
       </section>
 
@@ -121,8 +198,10 @@
 
 const campoBusca = document.querySelector('#campo-busca');
 const todosProdutos = document.querySelector('#produtos');
+const destaque = document.querySelector("#destaque");
 
 campoBusca.addEventListener('input', () => {
+  destaque.style.display = 'none';
   const termoBusca = campoBusca.value.trim().toLowerCase();
   const produtosFiltrados = Array.from(todosProdutos.querySelectorAll('.produto')).filter(produto => {
     const nomeProduto = produto.querySelector('h2').textContent.toLowerCase();

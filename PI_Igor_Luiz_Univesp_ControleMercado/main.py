@@ -1,536 +1,515 @@
 
 
-from flask import Flask, render_template,request,redirect,flash,session, url_for
+from flask import Flask, render_template,request,redirect,flash,session,url_for
 import json
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 import os
-from werkzeug.utils import secure_filename
-from datetime import date, time, datetime, timedelta
-
-
-
-
-
-data = datetime.today()
-datahoje = data.strftime("%Y-%m-%d %H:%M:%S")
-
-
+from datetime import date, time, datetime
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = "IGORKEVEN-M-S"
+app.config['SECRET_KEY'] = 'igorkeven'
 
 
-# rota para fazer logout
-@app.route('/sair')
-def logout():
-    session.clear() # Limpa a sessão
-    return redirect('/') # Redireciona para a página inicial
-
-
-
-
-
-# acesso a pagina inicial
 @app.route("/")
 def index():
-    with open('clientes.json') as f:
-        usuarios = json.load(f)
-
-    with open('artesao.json') as TodosArtesao:  # abertura do arquivo JSON
-        listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
-    if 'clienteLogado' in session:
-        carrinho = 'click para ver seu carrinho'
-        rotaCarrinho = '/cliente'
-        btnCompra = 'Adicionar no Carrinho'
-        rotaCompra = '/adicionarCarrinho'
+    with open('vendedor.json') as vendedor_json:
+        listaDeVendedor = json.load(vendedor_json)
+    with open('clientes.json') as cliente_json:
+        listaDeClientes = json.load(cliente_json)
+    if 'cliente' in session:
         logado = True
-        usuarioLogado = session['clienteLogado']
+        usuarioLogado = session['cliente']
+    
     else:
-        carrinho = 'Faça Login'
-        rotaCarrinho = '/login'
-        btnCompra = 'Faça login para comprar'
-        rotaCompra = '/login'
-        usuarioLogado =''
         logado = False
-    # produtos em destaque
-
+        usuarioLogado = ''
     produtos_destaque = []
-    quantidades = []
-    for artesao in listaArtesao:
-       
-        if artesao['produtos']:
-            for produto, dados in artesao['produtos'].items():
-                quantidades.append(dados['quantidade_vendida'])
+    for vendedor in listaDeVendedor:
+        if vendedor['produtos']:
+            for produto, dados in vendedor['produtos'].items():
+                produtos_destaque.append(dados['quantidade_vendida'])
+    quantidade_ordenada = sorted(produtos_destaque, reverse=True)
+    quantidades_selecionadas = quantidade_ordenada[:3]
+
+
+    return render_template('home.html',quantidades_selecionadas=quantidades_selecionadas,usuarioLogado=usuarioLogado,logado=logado, listaDeClientes=listaDeClientes, listaDeVendedor=listaDeVendedor)
+
+
+
+
+
+@app.route('/sair')
+def sair():
+    session.clear()
+    return redirect('/')
+
+@app.route('/loginVendedor')
+def loginVendedor():
+
+    return render_template('loginVendedor.html')
+
+@app.route("/acessoVendedor" , methods=['POST'])
+def acessoVendedor():
+    email = request.form.get('emailvendedor')
+    senha = request.form.get('senhavendedor')
+    with open('vendedor.json') as vendedor_json:
+        listaDeVendedor = json.load(vendedor_json)
+        cont = 0
+        for usuario in listaDeVendedor:
+            cont += 1 
+            
+            if email == usuario['email']   and senha == usuario['senha'] :
+                session['vendedor'] = email
+                if 'cliente' in session:
+                    del session['cliente']
+                return redirect('/vendedor')
+            if cont >= len(listaDeVendedor):
+                flash('Email ou senha incorretos.')
                 
-    # ordenar a lista de quantidades em ordem decrescente
-    quantidades_ordenadas = sorted(quantidades, reverse=True)   
-    # selecionar os 4 primeiros elementos da lista ordenada
-    quantidades_selecionadas = quantidades_ordenadas[:3]
+                return redirect('/loginVendedor')
 
 
-    return render_template('html/home.html',quantidades_selecionadas=quantidades_selecionadas,usuarioLogado=usuarioLogado,usuarios=usuarios,artesao=listaArtesao,carrinho=carrinho,rotaCarrinho=rotaCarrinho,btnCompra=btnCompra,rotaCompra=rotaCompra,logado=logado)
 
 
+@app.route('/loginCliente')
+def loginCliente():
+    if 'cliente' in session:
+        del session['cliente']
+    return render_template('loginCliente.html')
+
+
+@app.route("/acessoCliente", methods=['POST'])
+def acessoCliente():
+    email = request.form.get('emailCliente')
+    senha = request.form.get('senhaCliente')
+    with open('clientes.json') as cliente_json:
+        listaDeClientes = json.load(cliente_json)
+        cont = 0
+        for usuario in listaDeClientes:
+            cont += 1 
+            
+            if email == usuario['email']   and senha == usuario['senha'] :
+                session['cliente'] = email
+                if 'vendedor' in session:
+                    del session['vendedor']
+                return redirect('/cliente')
+            if cont >= len(listaDeClientes):
+                flash('Email ou senha incorretos.')
+                return redirect('/loginCliente')
+
+# ------------------------------------------------------------------------------------------------
+
+#--------------------- Pagina do Cliente ---------------------------------------------------------------
+@app.route('/cliente')
+def cliente():
+    if 'cliente' in session:
+        with open('vendedor.json') as vendedor_json:
+            listaVendedores = json.load(vendedor_json)
+
+        with open('clientes.json') as cliente_json:
+            listaDeClientes = json.load(cliente_json)
+            for usuario in listaDeClientes:
+                if usuario['email'] == session['cliente']:
+                    foto = usuario['foto']
+                    nome = usuario['nome']
+                    email = usuario['email']
+                    dados_cliente = usuario
+                    valor_pagar_vendedor = {}
+                    for produto, dados in usuario['carrinho'].items() :
+                        if dados['email_vendedor'] not in valor_pagar_vendedor:
+                            valor_pagar_vendedor[dados['email_vendedor']] = dados['preco'] * dados['quantidade']
+                        else:
+                            valor_pagar_vendedor[dados['email_vendedor']] += dados['preco'] * dados['quantidade']
+
+
+
+
+                    return render_template('cliente.html',valor_pagar_vendedor=valor_pagar_vendedor,listaVendedores=listaVendedores,dados_cliente=dados_cliente, foto=foto, nome=nome, email=email)
+    else:
+        flash('Necessario fazer login.')
+        return redirect('/loginCliente')
+# ---------------------------------------------------------------------------------------------------------------
+
+
+@app.route("/vendedor")
+def vendedor():
+    if 'vendedor' in session:
+        with open('vendedor.json') as vendedor_json:
+            listaVendedores = json.load(vendedor_json)
+            for vendedor in listaVendedores:
+                if vendedor['email'] == session['vendedor']:
+                    foto = vendedor['foto']
+                    nome = vendedor['nome']
+                    email = vendedor['email']
+                    return render_template('vendedor.html' , foto=foto, nome=nome, email=email, produtos=vendedor['produtos'])
+    else:
+        flash('Necessario fazer login.')
+        return redirect('/loginVendedor')
+
+
+
+@app.route('/cadastrar')
+def cadastrar():
+
+    return render_template('cadastro.html')
+
+
+@app.route('/cadastroCliente', methods=['POST'])
+def cadastroCliente():
+    email = request.form.get('emailclienter')
+    nome  = request.form.get('nomecliente')
+    senha  = request.form.get('senhacliente')
+
+    with open('clientes.json') as cliente_json:
+        listaDeClientes = json.load(cliente_json)
+        for usuario in listaDeClientes:
+            if usuario['email'] == email:
+                flash('Email já cadastrado no banco de dados, se esqueceu sua senha clique em "esqueci minha senha".')
+                return redirect('/loginCliente')
+    user = [
+        {
+            "nome": nome,
+            "email": email,
+            "senha": senha,
+            "foto": "",
+            "carrinho": {},
+            "total_preco": 0.0,
+            "historico": {}
+
+        }
+    ]
+
+    novalista = listaDeClientes + user
+
+    with open('clientes.json', 'w') as cliente_json:
+        json.dump(novalista, cliente_json, indent=4)
+
+
+    flash(f'{nome} cadastrado com sucesso!! BOAS COMPRAS!')
+    return redirect('/loginCliente')
+
+
+@app.route('/cadastroVendedor' , methods=['POST'])
+def cadastroVendedor():
+    email = request.form.get('emailVendedor')
+    nome = request.form.get('nomeVendedor')
+    senha = request.form.get('pixVendedor')
+    chavePIX = request.form.get('senhaVendedor')
+
+
+    with open('vendedor.json') as vendedores:
+        listaVendedores = json.load(vendedores)
+        for vendedor in listaVendedores:
+            if vendedor['email'] == email:
+                flash('usuario ja cadastrado, tente fazer login ou clique em esqueci minha senha. ')
+                return redirect('/loginVendedor')
+    user = [
+        {
+            "email":email,
+            "nome": nome,
+            "senha":senha,
+            "chavePIX":chavePIX,
+            "foto":"",
+            "produtos":{}
+        }
+    ]
+
+    novalista = listaVendedores + user
+    
+
+    with open('vendedor.json', 'w') as vendedores_json:
+        json.dump(novalista, vendedores_json , indent=4 )
+
+    flash(f'{nome} cadastrado com sucesso!! BOAS VENDAS!')
+    return redirect('/loginVendedor')
+    
+
+
+@app.route('/enviarFoto', methods=['POST'])
+def enviarFoto():
+    foto = request.files.get('foto')
+    emailUsuario = request.form.get('emailUsuario')
+    rota = request.form.get('rota')
+
+    nome_arquivo = f"Foto_perfil_{emailUsuario}.{foto.filename.split('.')[-1] }"
+    foto.save(os.path.join('static/fotoperfil', nome_arquivo))
+    if rota == '/cliente':
+        with open('clientes.json') as cliente_json:
+            listaclientes = json.load(cliente_json)
+            for cliente in listaclientes:
+                if cliente['email'] == emailUsuario:
+                    cliente['foto'] = nome_arquivo
+                    with open('clientes.json', 'w') as novoCliente:
+                        json.dump(listaclientes, novoCliente, indent=4)
+    else:
+        with open('vendedor.json') as vendedor_json:
+            listavendedor = json.load(vendedor_json)
+            for vendedor in listavendedor:
+                if vendedor['email'] == emailUsuario:
+                    vendedor['foto'] = nome_arquivo
+                    with open('vendedor.json', 'w') as novovendedor:
+                        json.dump(listavendedor, novovendedor, indent=4)
+    return redirect(rota)
+
+
+@app.route("/novaSenha", methods=['POST'])
+def novaSenha():
+    novasenha = request.form.get('novaSenha')
+    emailUsuario = request.form.get('emailUsuario')
+
+    if 'cliente' in session:
+        with open('clientes.json') as cliente_json:
+            listaDeClientes = json.load(cliente_json)
+            for usuario in listaDeClientes:
+                if usuario['email'] == emailUsuario:
+                    usuario['senha'] = novasenha
+        with open('clientes.json', 'w') as cliente_json:
+            json.dump(listaDeClientes, cliente_json, indent=4)
+        flash(f'Senha alterada com sucesso, a nova senha é {novasenha}')
+        return redirect('/cliente')
+
+    if 'vendedor' in session:
+        with open('vendedor.json') as vendedor_json:
+            listaDevendedor = json.load(vendedor_json)
+            for usuario in listaDevendedor:
+                if usuario['email'] == emailUsuario:
+                    usuario['senha'] = novasenha
+        with open('vendedor.json', 'w') as vendedor_json:
+            json.dump(listaDevendedor, vendedor_json, indent=4)
+        flash(f'Senha alterada com sucesso, a nova senha é {novasenha}')
+        return redirect('/vendedor')
+ 
+@app.route('/apagar_conta', methods=['POST'])
+def apagar_conta():
+    emailUsuario = request.form.get("emailUsuario")
+
+    if 'cliente' in session:
+        with open('clientes.json') as cliente_json:
+            listaClientes = json.load(cliente_json)
+            for cliente in listaClientes:
+                if cliente['email'] == emailUsuario:
+                    listaClientes.remove(cliente)
+                    del session['cliente']
+        with open('clientes.json', 'w') as cliente_novo:
+            json.dump(listaClientes, cliente_novo, indent=4 )
+    if 'vendedor' in session:
+        with open('vendedor.json') as vendedor_json:
+            listaVendedores = json.load(vendedor_json)
+            for vendedor in listaVendedores:
+                if vendedor['email'] == emailUsuario:
+                    listaVendedores.remove(vendedor)
+                    del session['vendedor']
+        with open('vendedor.json', 'w') as vendedor_novo:
+            json.dump(listaVendedores, vendedor_novo, indent=4)
+
+
+
+    return redirect('/')
+
+
+@app.route("/novo_produto", methods=['POST'])
+def novo_produto():
+
+    foto = request.files.get("foto")
+    nome_produto = request.form.get("nome")
+    preco = request.form.get("preco")
+    descricao = request.form.get("descricao")
+    emailUsuario =  request.form.get("emailUsuario")
+
+    with open('vendedor.json') as vendedor_json:
+        listaVendedores = json.load(vendedor_json)
+        for vendedor in listaVendedores:
+            if emailUsuario == vendedor['email']:
+                nome_arquivo = f"foto_produto{vendedor['email']}_{nome_produto}.{foto.filename.split('.')[-1]}"
+                foto.save(os.path.join('static/produtos', nome_arquivo))
+                vendedor['produtos'][nome_produto] = {
+                    "imagem": nome_arquivo,
+                    "descricao": descricao,
+                    "preco": float(preco),
+                    "quantidade_vendida": 0
+                }
+    with open('vendedor.json', 'w') as vendedor_novo:
+        json.dump(listaVendedores, vendedor_novo, indent=4)
+
+
+
+    return redirect('/vendedor')
+
+
+
+
+@app.route('/editar_produto', methods=['POST'])
+def editar_produto():
+    nome = request.form.get('editar_nome')
+    preco = request.form.get('editar_preco')
+    descricao = request.form.get('editar_descricao')
+    emailUsuario = request.form.get('emailUsuario')
+    nomeAntigo = request.form.get('nomeAntigo')
+
+    with open('vendedor.json') as vendedor_json:
+        listaVendedores = json.load(vendedor_json)
+        for vendedor in listaVendedores:
+            if emailUsuario == vendedor['email']:
+
+                vendedor['produtos'][nome] = {
+                    "imagem": vendedor['produtos'][nomeAntigo]['imagem'],
+                    "descricao": descricao,
+                    "preco": float(preco),
+                    "quantidade_vendida": vendedor['produtos'][nomeAntigo]['quantidade_vendida']
+                }
+
+                if nome != nomeAntigo:
+                    vendedor['produtos'].pop(nomeAntigo)
+
+                break
+
+    with open('vendedor.json', 'w') as vendedor_novo:
+        json.dump(listaVendedores, vendedor_novo, indent=4)
+
+
+
+
+
+
+    return redirect('/vendedor')
+
+
+# ---------------------------------------------------------------------------------------
+
+# ----------------------------excluir produto-----------------------------------------------------------
+
+@app.route('/excluir_produto', methods=['POST'])
+def excluir_produto():
+    nomeProduto = request.form.get('nomeProduto')
+    emailUsuario = request.form.get('emailUsuario')
+    with open('vendedor.json') as vendedor_json:
+        listaVendedores = json.load(vendedor_json)
+        for vendedor in listaVendedores:
+            if emailUsuario == vendedor['email']:
+                imagemProduto = vendedor['produtos'][nomeProduto]['imagem']
+                os.remove(os.path.join('static/produtos', imagemProduto))
+
+                del vendedor['produtos'][nomeProduto]
+
+    with open('vendedor.json', 'w') as vendedor_novo:
+        json.dump(listaVendedores, vendedor_novo, indent=4)
+
+    
+    return redirect('/vendedor')
+
+# ---------------------------------------------------------------------------------------
+
+
+
+
+# --------------------------adicionar no carrinho-------------------------------------------------------------
 
 @app.route('/adicionarCarrinho', methods=['POST'])
 def adicionarCarrinho():
-    imagem = request.form.get('imagem')
-    descricao = request.form.get('descricao')
-    preco = float(request.form.get('preco'))
     nome_produto = request.form.get('nome_produto')
-    id_vendedor = int(request.form.get('id_vendedor'))
-    pagina = request.form.get('pagina')
-    with open('clientes.json') as f:
-        usuarios = json.load(f)
-    # Encontrar o usuário correto pelo seu ID
-    for usuario in usuarios:
-        if usuario['email'] == session['clienteLogado']:
+    imagem_produto = request.form.get('imagem_produto')
+    preco_produto = float(request.form.get('preco_produto'))
+    descricao_produto = request.form.get('descricao_produto')
+    email_vendedor = request.form.get('email_vendedor')
+    pagina_retorno = request.form.get('pagina_retorno')
 
-            # Verificar se o produto já está no carrinho
-            if nome_produto in usuario['carrinho']:
-                # Incrementar a quantidade do produto em 1
-                usuario['carrinho'][nome_produto]['quantidade'] += 1
-            else:
-                # Adicionar um novo produto ao carrinho
-                usuario['carrinho'][nome_produto] = {
-                    'imagem': imagem,
-                    'descricao': descricao,
-                    'preco': preco,
-                    'id_vendedor': id_vendedor,
-                    'quantidade': 1
-                }
-            # Somar os preços dos produtos no carrinho do usuário
-            total_preco = sum([produto['preco'] * produto['quantidade'] for produto in usuario['carrinho'].values()])
-            usuario['total_preco'] = total_preco
-            # Salvar o conteúdo atualizado de volta no arquivo JSON
-            with open('clientes.json', 'w') as f:
-                json.dump(usuarios, f, indent=4)
-            break  # sair do loop depois de encontrar o usuário correto
-
-
-    if pagina == 'paginaCliente':
-        return redirect('/cliente')
-    return redirect('/')
-
-
-
-
-
-
-@app.route('/excluirItemCarrinho', methods=['POST'])
-def excluirItemCarrinho():
-    email = request.form.get('emailCliente')
-    nome_produto = request.form.get('nome_produto')
-    pagina = request.form.get('pagina')
-    with open('clientes.json') as f:
-        usuarios = json.load(f)
-    
-    # Encontrar o usuário correto pelo seu ID
-        for usuario in usuarios:
-            if email == usuario['email']:
-                if usuario['carrinho'][nome_produto] :
-                    # Subtrair o valor do item do total_preco
-                    usuario['total_preco'] -= usuario['carrinho'][nome_produto]['preco'] 
-                    
-                    # Verificar se a quantidade é maior que 1 antes de subtrair
-                    if usuario['carrinho'][nome_produto]['quantidade'] > 1:
-                        usuario['carrinho'][nome_produto]['quantidade'] -= 1
-                    else:
-                        del usuario['carrinho'][nome_produto]  # Se a quantidade for 1, remover o produto do carrinho
-                    
-                    # Salvar o conteúdo atualizado de volta no arquivo JSON
-                    with open('clientes.json', 'w') as f:
-                        json.dump(usuarios, f, indent=4)
-                    break  # sair do loop depois de encontrar o usuário correto
-
-    if pagina == 'paginaCliente':
-        return redirect('/cliente')
-
-    return redirect('/')
-
-
-
-# finalizar compra e guardar dados no historico
-@app.route('/finalizarCompra', methods=['POST'])
-def finalizarCompra():
-    
-    dados_usuario_str = request.form.get('dadosCliente') 
-    dados_usuario_str = dados_usuario_str.replace("'", "\"")
-    dados_usuario = json.loads(dados_usuario_str)
-    print(dados_usuario['email'])
-
-    with open('clientes.json') as f:
-        clientes = json.load(f)
-        for usuario in clientes:
-            print(usuario['email'])
-            if usuario['email'] == dados_usuario['email']:
-                
-                if len(usuario['historico']) > 0:
-                    usuario['historico'].append({
-                        "compras_finalizadas": usuario['carrinho'],
-                        "compra_feita_em": datetime.today().strftime("%Y-%m-%d %H:%M:%S")
-                    })
+    with open('clientes.json') as cliente_json:
+        listaClientes = json.load(cliente_json)
+        for cliente in listaClientes:
+            if cliente['email'] == session['cliente']:
+                if nome_produto in cliente['carrinho']:
+                    cliente['carrinho'][nome_produto]['quantidade'] += 1
                 else:
-                    usuario['historico'] = [{
-                        "compras_finalizadas": usuario['carrinho'],
-                        "compra_feita_em": datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+                    cliente['carrinho'][nome_produto] = {
+                        "imagem": imagem_produto,
+                        "descricao": descricao_produto,
+                        "preco": preco_produto,
+                        "email_vendedor": email_vendedor,
+                        "quantidade": 1
+                    }
+                total_preco = sum([produto['preco'] * produto['quantidade'] for produto in cliente['carrinho'].values()])
+                cliente['total_preco'] = total_preco
+                with open('clientes.json', 'w') as cliente_json:
+                    json.dump(listaClientes, cliente_json, indent=4)
+                break
+
+
+
+    return redirect(pagina_retorno)
+
+# ---------------------------------------------------------------------------------------
+
+
+# -----------------------remover do carrinho----------------------------------------------------------------
+
+@app.route('/remover_carrinho' , methods=['POST'])
+def remover_carrinho():
+    nome_produto = request.form.get('nome_produto')
+    pagina_retorno = request.form.get('pagina_retorno')
+    with open('clientes.json') as cliente_json:
+        listaClientes = json.load(cliente_json)
+        for cliente in listaClientes:
+            if cliente['email'] == session['cliente']:
+                cliente['total_preco'] -= cliente['carrinho'][nome_produto]['preco']
+
+                if cliente['carrinho'][nome_produto]['quantidade'] > 1:
+                    cliente['carrinho'][nome_produto]['quantidade'] -= 1
+                else:
+                    del cliente['carrinho'][nome_produto]
+                with open('clientes.json', 'w') as cliente_json:
+                    json.dump(listaClientes, cliente_json, indent=4)
+                break
+
+
+
+
+    return redirect(pagina_retorno)
+
+# ---------------------------------------------------------------------------------------
+
+#------------- finalização de compra --------------------------------------
+@app.route('/finalizar_compra', methods=['POST'])
+def finalizar_compra():
+    emailUsuario = request.form.get('emailUsuario')
+    with open('clientes.json') as cliente_json:
+        listaClientes = json.load(cliente_json)
+        for cliente in listaClientes:
+            if cliente['email'] == emailUsuario:
+                if len(cliente['historico']) > 0:
+                    novo = [{
+                        "compras_finalizadas": cliente['carrinho'],
+                        "compra_feita_em": datetime.today().strftime("%d-%m-%y %H:%M:%S")
                     }]
-                usuario['carrinho'] = {}
-                usuario['total_preco'] = 0.0
+                    cliente['historico'] = novo +  cliente['historico']
+                else:
+                    cliente['historico'] = [{
+                        "compras_finalizadas": cliente['carrinho'],
+                        "compra_feita_em": datetime.today().strftime("%d-%m-%y %H:%M:%S")
+                    }]
+                with open('vendedor.json') as vendedor_json:
+                    listaVendedores = json.load(vendedor_json)
+                    for vendedor in listaVendedores:
+                        for nome_produto, dados in cliente['carrinho'].items():
+                            if dados['email_vendedor'] == vendedor['email']:
+                                vendedor['produtos'][nome_produto]['quantidade_vendida'] += dados['quantidade']
+                cliente['carrinho'] = {}
+                cliente['total_preco'] = 0.0
 
-                with open('clientes.json', 'w') as f:
-                    json.dump(clientes, f, indent=4)
-                break  # sair do loop depois de encontrar o usuário correto
-    with open('artesao.json') as g:
-        artesoes = json.load(g)
-        for artesao in artesoes:
-            
-            
-                
-                for nome_produto, produto in dados_usuario['carrinho'].items():
-                        if produto['id_vendedor'] == artesao['id']:
-                            artesao_produtos = artesao['produtos']
-                            artesao_produtos[nome_produto]['quantidade_vendida'] += produto['quantidade']
+                with open('clientes.json', 'w') as cliente_json:
+                    json.dump(listaClientes, cliente_json, indent=4)
+                with open('vendedor.json', 'w') as vendedor_novo:
+                    json.dump(listaVendedores, vendedor_novo, indent=4)
 
 
-                with open('artesao.json', 'w') as f:
-                    json.dump(artesoes, f, indent=4)
+
 
     return redirect('/cliente')
 
 
 
 
+#-----------------------------------------------------------------------------
 
-@app.route('/cliente')
-def cliente():
-    if 'clienteLogado' in session:
-        email = session['clienteLogado']
-        with open('clientes.json') as c:
-            listaClientes = json.load(c)
-        with open('artesao.json') as f:
-            listaArtesao = json.load(f)
-
-            ids_vendedores = []
-            total_vendas = {} # dicionário para armazenar o valor total de vendas de cada vendedor
-            for cliente in listaClientes:
-                if email == cliente['email']:
-                    nome = cliente['nome']
-                    foto = cliente['foto']
-                    dadosCliente = cliente
-
-                    if cliente['carrinho']:
-                        for produto, dados in cliente['carrinho'].items():
-                            id_vendedor = dados['id_vendedor']
-                            if id_vendedor not in ids_vendedores:
-                                ids_vendedores.append(id_vendedor)
-                            # adiciona o valor da venda do produto ao valor total de vendas do vendedor
-                            if id_vendedor not in total_vendas:
-                                total_vendas[id_vendedor] = dados['preco'] * dados['quantidade']
-                            else:
-                                total_vendas[id_vendedor] += dados['preco'] * dados['quantidade']
-
-                    #dadosCliente['chavePIX'] = listaArtesao[id_vendedor - 1]['chavePIX'] # adiciona a chavePIX do vendedor ao cliente
-                    valor_total_pago = dadosCliente['total_preco']
-                    valor_total_vendas = sum(total_vendas.values())
-
-                    # cria um dicionário para armazenar o valor que cada vendedor irá receber
-                    valor_recebido_por_vendedor = {}
-                    for vendedor in ids_vendedores:
-                        valor_recebido_por_vendedor[vendedor] = (total_vendas[vendedor] / valor_total_vendas) * valor_total_pago
-
-                    # passa as informações para o template HTML
-                    return render_template('html/cliente.html', nome=nome, foto=foto,listaArtesao=listaArtesao , valor_recebido_por_vendedor=valor_recebido_por_vendedor,dadosCliente=dadosCliente)
-
-    else:
-        return redirect('/login')
-
-
-
-
-
-
-
-
-# acesso a pagina de login do cliente para liberar as compras
-@app.route("/login")
-def login():
-    return render_template('html/loginCliente.html')
-
-
-# validação de login para liberar acesso ao cliente
-@app.route("/acessoCliente", methods=['POST'])
-def acessoCliente():
-    email = request.form.get('EmailCliente') # pegando o email do formulario
-    senha = request.form.get('SenhaCliente') # pegando a senha do formulario
-
-    session['clienteLogado'] = email
-    if 'artesaoLogado' in session:
-        del session['artesaoLogado']
-    with open('clientes.json') as clientes:  # abertura do arquivo JSON
-        listaCliente = json.load(clientes) # colocando os dados do arquivo JSON dentro da variavel 
-        cont = 0
-        for cliente in listaCliente:  # loop para separar os dados 
-            cont +=1
-            if email == cliente['email'] and senha == cliente['senha']:#verificação se os dados escrito pelo usuario são iguais os salvos 
-                
-                return redirect('/cliente')
-
-            if cont >= len(listaCliente):
-                flash('Email ou senha incorretos')
-                return redirect('/login')
-
-
-
-
-
-# acesso a pagina do artesão onde ele fara upload dos artesanatos
-@app.route('/artesao')
-def artesao():
-    
-    if 'artesaoLogado' in session: # Verifica se a chave 'nomeUsuarioLogado' está presente na sessão
-        
-        email = session['artesaoLogado'] 
-        with open('artesao.json') as TodosArtesao:  # abertura do arquivo JSON
-            listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
-
-            for artesao in listaArtesao:  # loop para separar os dados 
-                if email == artesao['email']:
-                    nome = artesao['nome']
-                    foto = artesao['foto']
-                    return render_template('html/artesao.html',artesao=artesao,nome=nome,foto=foto)
-    else:
-        # Usuário não está logado, redireciona para a página de login
-        return redirect('/loginArtesao')
-
-
-
-
-# acesso a pagina de login do artesão
-@app.route("/loginArtesao")
-def loginArtesao():
-
-    return render_template('html/loginArtesao.html')
-
-
-# validação de login para liberar acesso ao artesao
-@app.route("/acessoArtesao", methods=['POST'])
-def acessoArtesao():
-    email = request.form.get('emailArtesao') # pegando o email do formulario
-    senha = request.form.get('senhaArtesao') # pegando a senha do formulario
-    session['artesaoLogado'] = email
-    if 'clienteLogado' in session:
-        del session['clienteLogado']
-    with open('artesao.json') as artesao:  # abertura do arquivo JSON
-        listaArtesao = json.load(artesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
-        cont = 0
-        for artesao in listaArtesao:  # loop para separar os dados 
-            cont +=1
-            
-            if email == artesao['email'] and senha == artesao['senha']:#verificação se os dados escrito pelo usuario são iguais os salvos 
-                return redirect('/artesao')
-            if cont >= len(listaArtesao):
-                flash('Email ou senha incorretos')
-                return redirect('/loginArtesao')
-
-# cadastro de novo produto , salva a foto , edita o nome e coloca o novonome junto ao arquivo do usuario
-@app.route('/novo_produto', methods=['POST'])
-def novo_produto():
-    foto = request.files.get('foto')
-    nome_produto = request.form.get('nome')
-    preco = request.form.get('preco')
-    descricao = request.form.get('descricao')
-    dados_usuario_str = request.form.get('dadosUsuario') 
-    dados_usuario_str = dados_usuario_str.replace("'", "\"")
-    #print(f"dados_usuario_str: {dados_usuario_str}")
-    dados_usuario = json.loads(dados_usuario_str)
-    nome_arquivo = secure_filename(foto.filename) # obtém a extensão do arquivo carregado e adiciona ao nome do arquivo
-    nome_arquivo = f"fotoProduto_{dados_usuario['nome']}_id_{dados_usuario['id']}_{nome_produto}"
-    nome_arquivo = f"{nome_arquivo}.{foto.filename.split('.')[-1]}"
-    foto.save(os.path.join('static/produtos', nome_arquivo))
-
-    with open('artesao.json', 'r') as arq:
-        lista_artesao = json.load(arq)
-
-    for artesao in lista_artesao:
-        if dados_usuario['email'] == artesao['email']:
-            if 'produtos' not in artesao:
-                artesao['produtos'] = {}
-            artesao['produtos'][nome_produto] = {
-                'imagem': nome_arquivo,
-                'descricao': descricao,
-                'preco': float(preco),
-                "quantidade_vendida": 0
-            }
-
-    with open('artesao.json', 'w') as arq:
-        json.dump(lista_artesao, arq, indent=4)
-
-    return redirect('/artesao')
-
-
-
-
-# edição do nome, preço e descrição do produto
-@app.route('/editar_produto', methods=['POST'])
-def editar_produto():
-    # Recebe os dados do formulário enviado
-    nome = request.form.get('editar_nome')
-    preco = int(request.form.get("editar_preco"))
-    descricao = request.form.get("editar_descricao")
-    produto_dados_str = request.form.get("editar_produto_dados")
-    produto_dados_str = produto_dados_str.replace("'", "\"")
-    produto_dados = json.loads(produto_dados_str)
-    nomeAntigo = request.form.get('nomeAntigo')
-    print(nomeAntigo)
-    # Carrega o arquivo JSON em memória
-    with open('artesao.json', 'r') as f:
-        data = json.load(f)
-
-        for artesao in data:
-            
-            if produto_dados['id'] == artesao['id']:
-                        
-                produtos = artesao['produtos']
-                produtos_chaves = list(produtos.keys())
-                index_antigo = produtos_chaves.index(nomeAntigo)
-
-                artesao['produtos'][nome] = {
-                    "imagem": produtos[nomeAntigo]['imagem'],
-                    "descricao": descricao,
-                    "preco": preco,
-                    "quantidade_vendida": artesao['produtos'][nomeAntigo]['quantidade_vendida']
-                }
-                
-                if nomeAntigo != nome:
-                    produtos.pop(nomeAntigo)
-                    produtos_chaves.pop(index_antigo)
-
-
-                break
-                
-                        
-
-    with open('artesao.json', 'w') as f:
-        json.dump(data, f, indent=4)
-
-
-
-    # Redireciona o usuário para a página principal
-    return redirect('/artesao')
-
-
-# excluir produto
-@app.route('/excluir_produto', methods=['POST'])
-def excluir_produto():
-    # Recebe o nome do produto a ser excluído do formulário enviado
-    nome_produto = request.form.get('nomeProduto')
-    produto_dados_str = request.form.get("produto_dados")
-    produto_dados_str = produto_dados_str.replace("'", "\"")
-    produto_dados = json.loads(produto_dados_str)
-
-    # Carrega o arquivo JSON em memória
-    with open('artesao.json', 'r') as f:
-        data = json.load(f)
-
-        for artesao in data:
-            if produto_dados['id'] == artesao['id']:
-                # pega o nome da imagem
-                imagem_produto = artesao['produtos'][nome_produto]['imagem']
-                # apaga a imagem do diretorio
-                os.remove(os.path.join('static/produtos', imagem_produto))
-                # Remove o produto do dicionário de produtos do artesão
-                del artesao['produtos'][nome_produto]
-
-    # Salva as alterações no arquivo JSON
-    with open('artesao.json', 'w') as f:
-        json.dump(data, f, indent=4)
-
-    # Redireciona o usuário para a página principal
-    return redirect('/artesao')
-
-
-
-
-
-
-
-
-
-
-#mudar senha artesão
-@app.route('/mudar_senha', methods=['POST'])
-def mudar_senha():
-
-    novasenha = request.form.get('novaSenha')
-    dados_usuario_str =  request.form.get('dadosUsuario')
-    dados_usuario_str = dados_usuario_str.replace("'", "\"")
-    dados_usuario = json.loads(dados_usuario_str)
-    if 'artesaoLogado' in session:
-        with open('artesao.json') as f:
-            artesoes = json.load(f)
-            for artesao in artesoes:
-                if artesao['email'] == dados_usuario['email']:
-                    artesao['senha'] = novasenha
-        
-        with open('artesao.json', 'w') as f:
-            json.dump(artesoes, f, indent=4)
-        flash(f'Senha alterada com sucesso, a nova senha é {novasenha}')
-        return redirect('/artesao')
-    
-    if 'clienteLogado' in session:
-        with open('clientes.json') as f:
-            usuarios = json.load(f)
-            for usuario in usuarios:
-                if usuario['email'] == dados_usuario['email']:
-                    usuario['senha'] = novasenha
-                    
-        with open('clientes.json', 'w') as f:
-            json.dump(usuarios, f, indent=4)
-        flash(f'Senha alterada com sucesso, a nova senha é {novasenha}')
-        return redirect('/cliente')
-
-
-   
-
-
-    
-
-# apagar conta de usuario artesão
-@app.route('/apagar_conta', methods=['POST'])
-def apagar_conta():
-    emailUsuario = request.form.get('EmailUsuario')
-
-
-
-    if 'artesaoLogado' in session:
-        
-        with open('artesao.json') as TodosArtesao: 
-            listaArtesao = json.load(TodosArtesao)
-            for artesao in listaArtesao:
-                if artesao['email'] == emailUsuario:
-                    
-                    listaArtesao.remove(artesao)
-                    del session['artesaoLogado']
-        with open('artesao.json', 'w') as f:
-            json.dump(listaArtesao, f, indent=4)
-    
-
-    if 'clienteLogado' in session:
-        with open('clientes.json') as f:
-            usuarios = json.load(f)
-            for usuario in usuarios:
-                if usuario['email'] == emailUsuario:
-                    usuarios.remove(usuario)
-                    del session['clienteLogado']
-        with open('clientes.json', 'w') as f:
-            json.dump(usuarios, f, indent=4)
-
-
-
-    return redirect('/')
+#---------------------------- esqueceu a senha e envio de email -----------------------------
 
 # pagina de recuperação de senha 
 @app.route('/esqueceuSenha')
@@ -586,123 +565,8 @@ def enviarEmail():
 
 
 
-# rota e função para envio de foto de perfil
-@app.route('/enviar_foto', methods=['POST'])
-def enviar_foto():
-    retornoRota = request.form.get('retornoRota')
-    foto = request.files.get('foto')
-    dadosUsuario_str = request.form.get('dadosUsuario')
-    
-    # substitui as aspas simples por aspas duplas
-    dadosUsuario_str = dadosUsuario_str.replace("'", "\"")
-    print(dadosUsuario_str)
-    dadosUsuario = json.loads(dadosUsuario_str)
-    nome_arquivo = f"fotoPerfil_{dadosUsuario['nome']}_id_{dadosUsuario['id']}"
-    nome_arquivo = secure_filename(nome_arquivo) # obtém a extensão do arquivo carregado e adiciona ao nome do arquivo
-    nome_arquivo = f"{nome_arquivo}.{foto.filename.split('.')[-1]}"
+#-----------------------------------------------------------------------------------------------------------
 
-    foto.save(os.path.join('static/fotoPerfil', nome_arquivo))
-    if retornoRota == '/artesao':
-        
-        with open('artesao.json') as TodosArtesao:  # abertura do arquivo JSON
-            listaArtesao = json.load(TodosArtesao) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
-
-            for artesao in listaArtesao:  # loop para separar os dados 
-               
-                if dadosUsuario['email'] == artesao['email']:
-                    artesao['foto'] = nome_arquivo # atualiza o nome do arquivo no dicionário correspondente
-                    with open('artesao.json', 'w') as TodosArtesao:  # abre o arquivo JSON em modo de escrita
-                        json.dump(listaArtesao, TodosArtesao, indent=4) # escreve a lista atualizada de volta no arquivo JSON
-    else:
-        with open('clientes.json') as c:  # abertura do arquivo JSON
-            lista = json.load(c) # colocando os dados do arquivo JSON dentro da variavel listaArtesao
-
-            for cliente in lista:  # loop para separar os dados 
-                
-                if dadosUsuario['email'] == cliente['email']:
-                    cliente['foto'] = nome_arquivo # atualiza o nome do arquivo no dicionário correspondente
-                    with open('clientes.json', 'w') as all:  # abre o arquivo JSON em modo de escrita
-                        json.dump(lista, all, indent=4) # escreve a lista atualizada de volta no arquivo JSON
-
-
-    return redirect(retornoRota)
-
-
-
-# rota que renderiza a pagina de cadastro
-@app.route("/cadastrar")
-def cadastrar():
-
-    return render_template('html/cadastrar.html')
-
-
-#rota para cadastrar artesao
-@app.route("/cadastrarArtesao", methods=['POST'])
-def cadastrarArtesao():
-    # pegando os dados que o usuario digitou no formulario de cadastro de artesão
-    email = request.form.get('emailArtesaoCadastro')
-    senha = request.form.get('senhaArtesaoCadastro')
-    nome = request.form.get('nomeCadastroartesao')
-    chavepix = request.form.get('chavePIX')
-    id = 0 # definindo um valor iniciar para o ID
-    with open('artesao.json') as artesao_json: # abrindo o arquivo onde tem todos os usuarios ja cadastrados
-        listaArtesao = json.load(artesao_json)# colocando todo arquivo dentro da variavel
-    for artesao in listaArtesao: # fazend o laço em todos os usuarios salvos
-        id = artesao['id'] +1 # pegando o ultimo ID e adicionando 1 para o novo ID
-        if email == artesao['email']:# verificando se o novo usuario ja não esta cadastrado atravez do email
-            flash('opa parece que esse email ja esta cadastrado, se caso tenha esquecido a senha click em esqueci minha senha!')
-            return redirect('/cadastrar')# se ja tiver um email cadastrado ele redireciona e da essa menssagem
-# criando um novo  usuario com os dados obitidos do formulario html
-    user = [    
-        {
-        "email": email,
-        "senha": senha,
-        "nome": nome,
-        "chavePIX": chavepix,
-        "id": id ,
-        "foto": ""}] # a foto de perfil sempre inicia vazia, depois o usuario pode adicionar uma...
-    novaListaArtesao = listaArtesao + user # concatenando todos usuarios ja salvos com o novo e colocando em uma variavel
-    with open('artesao.json', 'w') as artesao_json:# abrindo o arquivo JSON em mode de escrita(para edições)
-        json.dump(novaListaArtesao,artesao_json, indent=4 )# salvando todos incluindo o novo usuario no arquivo JSON
-    flash('Usuario cadastrado com sucesso!! BOAS VENDAS !!')
-    return redirect('/loginArtesao') # redireciona para o login junto com a menssagem flash
-
-
-
-
-#rota para cadastrar cliente
-@app.route("/cadastrarCliente", methods=['POST'])
-def cadastrarCliente():
-    # pegando os dados que o usuario digitou no formulario de cadastro 
-    email = request.form.get('emailClienteCadastro')
-    senha = request.form.get('senhaClienteCadastro')
-    nome = request.form.get('nomeCadastroCliente')
-    id = 0 # definindo um valor iniciar para o ID
-    with open('clientes.json') as cliente_json: # abrindo o arquivo onde tem todos os usuarios ja cadastrados
-        listaCliente = json.load(cliente_json)# colocando todo arquivo dentro da variavel
-    for cliente in listaCliente: # fazend o laço em todos os usuarios salvos
-        id = cliente['id'] +1 # pegando o ultimo ID e adicionando 1 para o novo ID
-        if email == cliente['email']:# verificando se o novo usuario ja não esta cadastrado atravez do email
-            flash('opa parece que esse email ja esta cadastrado, se caso tenha esquecido a senha click em esqueci minha senha!')
-            return redirect('/cadastrar')# se ja tiver um email cadastrado ele redireciona e da essa menssagem
-# criando um novo  usuario com os dados obitidos do formulario html
-    user = [    
-        {
-        "nome": nome,
-        "email": email,
-        "senha": senha,
-        "id": id ,
-        "foto": "",
-        "carrinho": {},
-        "total_preco": 0.0,
-        "historico":{}
-        }
-        ] # a foto de perfil sempre inicia vazia, depois o usuario pode adicionar uma...
-    novaListaCliente = listaCliente + user # concatenando todos usuarios ja salvos com o novo e colocando em uma variavel
-    with open('clientes.json', 'w') as cliente_json:# abrindo o arquivo JSON em mode de escrita(para edições)
-        json.dump(novaListaCliente,cliente_json, indent=4 )# salvando todos incluindo o novo usuario no arquivo JSON
-    flash('Usuario cadastrado com sucesso!! BOAS COMPRAS !!')
-    return redirect('/login') # redireciona para o login junto com a menssagem flash
 
 
 

@@ -64,17 +64,19 @@
         <div id="produtos" class="produtos">
             <!-- aqui fica os produtos -->
             {% if produtos %}
-                {% for produto, dados in produtos.items() %}
+                {% for produto in produtos %}
                     <div class="produto">
-                        <img src="{{ url_for('static', filename='produtos/' + dados['imagem'] )}}" id="img_produto" alt="{{produto}}" width="200">
-                        <h2>{{produto}}</h2>
-                        <p>{{ dados['descricao'] }}</p>
-                        <p>Preço: R$ {{dados['preco']}}</p>
+                        <img src="{{ url_for('static', filename='produtos/' + produto[3] )}}" id="img_produto" alt="{{produto}}" width="200">
+                        <h2>{{produto[2]}}</h2>
+                        <p>{{ produto[4] }}</p>
+                        <p>Preço: R$ {{produto[5]}}</p>
+                        <p>codigo do produto: {{produto[0]}}</p>
+                        
 
                         <button id="Editar">Editar</button>
 
                         <form action="/excluir_produto" method="post">
-                            <input type="hidden" name="nomeProduto" value="{{produto}}">
+                            <input type="hidden" name="id_produto" value="{{produto[0]}}">
                             <input type="hidden" name="emailUsuario" value="{{email}}">
                             <input type="submit" id="excluir" value="Excluir">
                         </form>
@@ -101,6 +103,8 @@
                 <br>
                 <input type="hidden" name="nomeAntigo" id="nomeAntigo" value="">
                 <input type="hidden" name="emailUsuario" value="{{email}}">
+                <input type="hidden" name="id_produto" id="id_produto" >
+                
                 
 
                 <input type="submit" value="Salvar">

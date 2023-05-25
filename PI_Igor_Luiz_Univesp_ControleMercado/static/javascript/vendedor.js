@@ -77,12 +77,14 @@ botaoEditar.forEach( (botao) =>{
         var preco = botao.parentNode.querySelector('p:nth-child(4)').textContent.replace("Preço: R$ ","");
         var descricao = botao.parentNode.querySelector('p:nth-child(3)').textContent;
         var imagem = botao.parentNode.querySelector('img').src;
+        var codProduto = botao.parentNode.querySelector('p:nth-child(5)').textContent.replace("codigo do produto: ","")
 
         document.querySelector("#editar_nome").value = produto ;
         document.querySelector("#editar_preco").value = preco ;
         document.querySelector("#editar_descricao").value = descricao ;
         document.querySelector("#nomeAntigo").value = produto ;
         document.querySelector("#imagem-produto").setAttribute('src', imagem)
+        document.querySelector("#id_produto").value = codProduto;
 
 
 

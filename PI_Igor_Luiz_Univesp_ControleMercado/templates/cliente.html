@@ -44,7 +44,7 @@
             <h3 class="menu_perfil" id="btnHistorico">Historico de Compras</h3>
             <h3 class="menu_perfil" id="paginaInicial">Ir para as Compras</h3>
             <h3 class="menu_perfil" id="Meus_pedidos">Meus Pedidos</h3>
-            <h3>Total a Pagar : R${{dados_cliente['total_preco']}}</h3>
+            <h3>Total a Pagar : R${{dados_cliente[4]}}</h3>
             <h3 class="menu_perfil" id="finalizarCompra">Finalizar Compra</h3>
             <h3 class="apagar_conta" id="apagar_conta">Apagar minha conta</h3>
         </aside>
@@ -54,46 +54,50 @@
         <div id="produtos" class="produtos">
             <!-- aqui fica os produtos -->
 
-            {% if dados_cliente['carrinho'] %}
-                {% for produto, dados in dados_cliente['carrinho'].items() %}
-                    <div class="produto">
-                        <img src="{{url_for('static', filename='produtos/'+ dados['imagem'] )}}" alt="imagem do produto:{{produto}}" width="200">
-                        <h2>{{produto}}</h2>
-                        <p>{{dados['descricao']}}</p>
-                        <p>Preço R${{dados['preco']}}</p>
-                        {% for vendedor in listaVendedores %}
-                            {% if dados['email_vendedor'] == vendedor['email'] %}
-                            <p>Vendedor: {{vendedor['nome']}}</p>
-                            {% endif %}
-                        {% endfor %}
+            {% if carrinho %}
+                {% for produto in carrinho %}
+                    {% if produto[1] == email %}
+                        <div class="produto">
+                            <img src="{{url_for('static', filename='produtos/'+ produto[3] )}}" alt="imagem do produto:{{produto}}" width="200">
+                            <h2>{{produto[2]}}</h2>
+                            <p>{{produto[4]}}</p>
+                            <p>Preço R${{produto[5]}}</p>
+                            {% for vendedor in vendedores %}
+                                {% if produto[6] == vendedor[0] %}
+                                    <p>Vendedor: {{vendedor[1]}}</p>
+                                {% endif %}
+                            {% endfor %}
+                            
 
-                        <form action="/adicionarCarrinho" method="post" >
+                            <form action="/adicionarCarrinho" method="post" >
 
-                                <input type="hidden" name="nome_produto" value="{{produto}}">
-                                <input type="hidden" name="imagem_produto" value="{{dados['imagem']}}">
-                                <input type="hidden" name="preco_produto" value="{{dados['preco']}}">
-                                <input type="hidden" name="descricao_produto" value="{{dados['descricao']}}">
-                                <input type="hidden" name="email_vendedor" value="{{dados['email_vendedor']}}">
-                                <input type="hidden" name="pagina_retorno" value="/cliente">
-
-
-                                <input type="submit"  id="btn_item_carrinho" value="Item no Carrinho&#10;Quantidade: {{dados_cliente['carrinho'][produto]['quantidade']}}&#10;Adicionar + 1">
-                                            
-                            </form>
-                            <br>
-
-                            <form action="/remover_carrinho" method="post">
-                                <input type="hidden" name="nome_produto" value="{{produto}}">
-                                <input type="hidden" name="pagina_retorno" value="/cliente">
-                                <input type="submit" id="btn_remover_carrinho" value="Remover do Carrinho">
-                            </form>
+                                    <input type="hidden" name="nome_produto" value="{{produto[2]}}">
+                                    <input type="hidden" name="imagem_produto" value="{{produto[3]}}">
+                                    <input type="hidden" name="preco_produto" value="{{produto[5]}}">
+                                    <input type="hidden" name="descricao_produto" value="{{produto[4]}}">
+                                    <input type="hidden" name="email_vendedor" value="{{produto[6]}}">
+                                    <input type="hidden" name="pagina_retorno" value="/cliente">
+                                    <input type="hidden" name="email_usuario" value="{{email}}">
 
 
+                                    <input type="submit"  id="btn_item_carrinho" value="Item no Carrinho&#10;Quantidade: {{produto[7]}}&#10;Adicionar + 1">
+                                                
+                                </form>
+                                <br>
+
+                                <form action="/remover_carrinho" method="post">
+                                    <input type="hidden" name="nome_produto" value="{{produto[2]}}">
+                                    <input type="hidden" name="pagina_retorno" value="/cliente">
+                                    <input type="submit" id="btn_remover_carrinho" value="Remover do Carrinho">
+                                </form>
 
 
 
 
-                    </div>
+
+
+                        </div>
+                    {% endif %}
                 {% endfor %}
             {% endif %}
         </div>
@@ -131,24 +135,26 @@
 
         <div class="historico" id="historico">
             <!-- aqui mostra os produtos com compras ja finalizadas -->
-            {% if dados_cliente['historico'] %}
+            {% if historico %}
             
-                {% for compra in dados_cliente['historico'] %}
+                {% for compra in historico %}
                 <div class="historico_compra">
-                    <h2 class="compra_realizada">Compra realizada em {{compra['compra_feita_em']}}</h2>
-                    {% for produto, dados in compra['compras_finalizadas'].items() %}
-                        <div id="produto">
-                            <img src="{{url_for('static', filename='produtos/'+ dados['imagem'] )}}" alt="imagem do produto:{{produto}}" width="200">
-                            <h2>{{produto}}</h2>
-                            <p>{{dados['descricao']}}</p>
-                            <p>Preço R${{dados['preco']}}</p>
-                            {% for vendedor in listaVendedores %}
-                                {% if dados['email_vendedor'] == vendedor['email'] %}
-                                <p>Vendedor: {{vendedor['nome']}}</p>
+                    <h2 class="compra_realizada">Compra realizada em {{compra[2]}}</h2>
+                    {% for produto in itens_historico %}
+                        {% if produto[0] == compra[0] %}
+                            <div id="produto">
+                                <img src="{{url_for('static', filename='produtos/'+ produto[3] )}}" alt="imagem do produto:{{produto}}" width="200">
+                                <h2>{{produto[2]}}</h2>
+                                <p>{{produto[4]}}</p>
+                                <p>Preço R${{produto[5]}}</p>
+                                {% for vendedor in vendedores %}
+                                {% if produto[6] == vendedor[0] %}
+                                    <p>Vendedor: {{vendedor[1]}}</p>
                                 {% endif %}
                             {% endfor %}
-                            <p>Quantidade: {{dados['quantidade']}}</p>
-                        </div>
+                                    <p>Quantidade: {{produto[7]}}</p>
+                            </div>
+                        {% endif %}
                     {% endfor %}
                 </div>
                 {% endfor %}
@@ -214,11 +220,11 @@ finalizarCompra.addEventListener("click", ()=>{
     <div class="modal-content">
         <span class="close">&times;</span>
         {% for email_vendedor_pagar, valor_pagar in valor_pagar_vendedor.items()  %}
-            {% for vendedor in listaVendedores %}
-                {% if vendedor['email'] == email_vendedor_pagar %}
+            {% for vendedor in vendedores %}
+                {% if vendedor[0] == email_vendedor_pagar %}
                     <div class="valor_finalizar_compras">
-                        Pagar para {{vendedor['nome']}}: R$ {{valor_pagar}}<br>
-                        Chave PIX : {{vendedor['chavePIX']}}
+                        Pagar para {{vendedor[1]}}: R$ {{valor_pagar}}<br>
+                        Chave PIX : {{vendedor[3]}}
 
                     </div>
                     <br><br>

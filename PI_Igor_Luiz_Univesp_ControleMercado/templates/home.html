@@ -35,70 +35,102 @@
         <div class="produtos">
             <!-- aqui vamos colocar os produtos em destaque -->
 
-            {% for vendedor in listaDeVendedor %}
-                {% if vendedor['produtos'] %}
-                    {% for produto, dados in vendedor['produtos'].items() %}
-                    {% if dados['quantidade_vendida'] in quantidades_selecionadas %}
-                        <div class="produto">
-                            <img src="{{url_for('static', filename='produtos/'+ dados['imagem'] )}}" alt="imagem do produto:{{produto}}" width="200">
-                            <h2>{{produto}}</h2>
-                            <p>{{dados['descricao']}}</p>
-                            <p>Preço: R$ {{dados['preco']}}</p>
-                            <p>Vendedor: {{vendedor['nome']}}</p>
+            {% for vendedor in vendedores %}
+            {% if vendedor %}
+                {% for produto_vendedor in produtos_vendedor %}
+                    {% if produto_vendedor[6] in quantidades_selecionadas %}
+                        {% if vendedor[0] == produto_vendedor[1] %}
+                            <div class="produto">
+                                    <img src="{{url_for('static', filename='produtos/' + produto_vendedor[3])}}" alt="imagem do produto: {{produto_vendedor[1]}}" width="200">
+                                    <h2>{{produto_vendedor[2]}}</h2>
+                                    <p>{{produto_vendedor[4]}}</p>
+                                    <p>Preço: R$ {{produto_vendedor[5]}}</p>
+                                    <p>Vendedor: {{vendedor[1]}}</p>
+                                {% if logado %}
+                                    <form action="/adicionarCarrinho" method="post" >
+                                        <input type="hidden" name="nome_produto" value="{{produto_vendedor[2]}}">
+                                        <input type="hidden" name="imagem_produto" value="{{produto_vendedor[3]}}">
+                                        <input type="hidden" name="preco_produto" value="{{produto_vendedor[5]}}">
+                                        <input type="hidden" name="descricao_produto" value="{{produto_vendedor[4]}}">
+                                        <input type="hidden" name="email_vendedor" value="{{vendedor[0]}}">
+                                        <input type="hidden" name="pagina_retorno" value="/">
+                                        <input type="hidden" name="id_produto" value="{{produto_vendedor[0]}}">
+                                        <input type="hidden" name="email_usuario" value="{{usuarioLogado}}">
+                                {% else %}
+                                    <form action="/loginCliente" method="get" >
+                                {% endif %}
 
-                            {% if logado %}
-                            <form action="/adicionarCarrinho" method="post" >
+                                    
+
+                                {% if logado %}
+                        
+                            {% if carrinho  %}
+                                {% for item in carrinho %}
+                                    
+                                        {% if produto_vendedor[2] == item[2] %}
+                                            <input type="submit"  class="btn_item_carrinho" value="Item no Carrinho&#10;Quantidade: {{item[7]}}&#10;Adicionar + 1">
+                                        {% else %}
+                                        <input type="submit" value="Adicionar ao carrinho">
+                                        {% endif %}
+                                    
+                                {% endfor %}
                             {% else %}
-                            <form action="/loginCliente" method="get" >
+                                <input type="submit" value="Adicionar ao carrinho">
                             {% endif %}
+                        
+                    {% else %}
+                        <input type="submit" value="Faça Login">
+                    {% endif %}
 
-                                <input type="hidden" name="nome_produto" value="{{produto}}">
-                                <input type="hidden" name="imagem_produto" value="{{dados['imagem']}}">
-                                <input type="hidden" name="preco_produto" value="{{dados['preco']}}">
-                                <input type="hidden" name="descricao_produto" value="{{dados['descricao']}}">
-                                <input type="hidden" name="email_vendedor" value="{{vendedor['email']}}">
-                                <input type="hidden" name="pagina_retorno" value="/">
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+                               
+                                </form>
+                                <br>
 
                                 {% if logado %}
                                     
-                                    {% for cliente in listaDeClientes %}
-                                        {% if usuarioLogado == cliente['email'] %}
-                                            {% if produto in cliente['carrinho']  %}
-                                                <input type="submit"  class="btn_item_carrinho" value="Item no Carrinho&#10;Quantidade: {{cliente['carrinho'][produto]['quantidade']}}&#10;Adicionar + 1">
-                                            {% else %}
-                                                <input type="submit" value="Adicionar ao Carrinho">
+                                        {% for produto in carrinho %}
+                                            {% if produto_vendedor[2] in produto[2]  %}
+                                                <form action="/remover_carrinho" method="post">
+                                                    <input type="hidden" name="nome_produto" value="{{produto_vendedor[2]}}">
+                                                    <input type="hidden" name="pagina_retorno" value="/">
+                                                    <input type="submit" class="btn_remover_carrinho" value="Remover do Carrinho">
+                                                </form>
                                             {% endif %}
-                                        {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                <input type="submit" value="Faça Login">
-
+                                        {% endfor %}
+                                    
                                 {% endif %}
-                            </form>
-                            <br>
-
-                            {% if logado %}
-                                {% for cliente in listaDeClientes %}
-                                    {% if cliente['carrinho'][produto] %}
-                                        <form action="/remover_carrinho" method="post">
-                                            <input type="hidden" name="nome_produto" value="{{produto}}">
-                                            <input type="hidden" name="pagina_retorno" value="/">
-                                            <input type="submit" class="btn_remover_carrinho" value="Remover do Carrinho">
-                                        </form>
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
 
 
 
 
 
-                        </div>
+
+
+                            </div>
                         {% endif %}
-                    {% endfor %}
-                {% endif %}
-            {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+
+
+
+
+
 
 
         </div>
@@ -109,68 +141,101 @@
         <div class="produtos">
             <!-- aqui vamos colocar todos os produtos -->
 
-            {% for vendedor in listaDeVendedor %}
-                {% if vendedor['produtos'] %}
-                    {% for produto, dados in vendedor['produtos'].items() %}
-                        <div class="produto">
-                            <img src="{{url_for('static', filename='produtos/'+ dados['imagem'] )}}" alt="imagem do produto:{{produto}}" width="200">
-                            <h2>{{produto}}</h2>
-                            <p>{{dados['descricao']}}</p>
-                            <p>Preço: R$ {{dados['preco']}}</p>
-                            <p>Vendedor: {{vendedor['nome']}}</p>
+            {% for vendedor in vendedores %}
+                
+                    {% for produto_vendedor in produtos_vendedor %}
+                        {% if vendedor[0] == produto_vendedor[1] %}
+                            <div class="produto">
+                                    <img src="{{url_for('static', filename='produtos/' + produto_vendedor[3])}}" alt="imagem do produto: {{produto_vendedor[1]}}" width="200">
+                                    <h2>{{produto_vendedor[2]}}</h2>
+                                    <p>{{produto_vendedor[4]}}</p>
+                                    <p>Preço: R$ {{produto_vendedor[5]}}</p>
+                                    <p>Vendedor: {{vendedor[1]}}</p>
 
-                            {% if logado %}
-                            <form action="/adicionarCarrinho" method="post" >
+                                {% if logado %}
+                                    <form action="/adicionarCarrinho" method="post" >
+                                        <input type="hidden" name="nome_produto" value="{{produto_vendedor[2]}}">
+                                        <input type="hidden" name="imagem_produto" value="{{produto_vendedor[3]}}">
+                                        <input type="hidden" name="preco_produto" value="{{produto_vendedor[5]}}">
+                                        <input type="hidden" name="descricao_produto" value="{{produto_vendedor[4]}}">
+                                        <input type="hidden" name="email_vendedor" value="{{vendedor[0]}}">
+                                        <input type="hidden" name="pagina_retorno" value="/">
+                                        <input type="hidden" name="email_usuario" value="{{usuarioLogado}}">
+                                        <input type="hidden" name="id_produto" value="{{produto_vendedor[0]}}">
+                                {% else %}
+                                    <form action="/loginCliente" method="get" >
+                                {% endif %}
+
+                                    
+
+
+
+
+
+
+
+
+
+                    {% if logado %}
+                        
+                            {% if carrinho  %}
+                                {% for item in carrinho %}
+                                    
+                                        {% if produto_vendedor[2] == item[2] %}
+                                            <input type="submit"  id="btn_item_carrinho" value="Item no Carrinho&#10;Quantidade: {{item[7]}}&#10;Adicionar + 1">
+                                        {% else %}
+                                        <input type="submit" value="Adicionar ao carrinho">
+                                        {% endif %}
+                                    
+                                {% endfor %}
                             {% else %}
-                            <form action="/loginCliente" method="get" >
+                                <input type="submit" value="Adicionar ao carrinho">
                             {% endif %}
+                        
+                    {% else %}
+                        <input type="submit" value="Faça Login">
+                    {% endif %}
 
-                                <input type="hidden" name="nome_produto" value="{{produto}}">
-                                <input type="hidden" name="imagem_produto" value="{{dados['imagem']}}">
-                                <input type="hidden" name="preco_produto" value="{{dados['preco']}}">
-                                <input type="hidden" name="descricao_produto" value="{{dados['descricao']}}">
-                                <input type="hidden" name="email_vendedor" value="{{vendedor['email']}}">
-                                <input type="hidden" name="pagina_retorno" value="/">
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+                               
+                                </form>
+                                <br>
 
                                 {% if logado %}
                                     
-                                    {% for cliente in listaDeClientes %}
-                                        {% if usuarioLogado == cliente['email'] %}
-                                            {% if produto in cliente['carrinho']  %}
-                                                <input type="submit"  id="btn_item_carrinho" value="Item no Carrinho&#10;Quantidade: {{cliente['carrinho'][produto]['quantidade']}}&#10;Adicionar + 1">
-                                            {% else %}
-                                                <input type="submit" value="Adicionar ao Carrinho">
+                                        {% for produto in carrinho %}
+                                            {% if produto_vendedor[2] in produto[2]  %}
+                                                <form action="/remover_carrinho" method="post">
+                                                    <input type="hidden" name="nome_produto" value="{{produto_vendedor[2]}}">
+                                                    <input type="hidden" name="pagina_retorno" value="/">
+                                                    <input type="submit" id="btn_remover_carrinho" value="Remover do Carrinho">
+                                                </form>
                                             {% endif %}
-                                        {% endif %}
-                                    {% endfor %}
-                                {% else %}
-                                <input type="submit" value="Faça Login">
-
+                                        {% endfor %}
+                                    
                                 {% endif %}
-                            </form>
-                            <br>
-
-                            {% if logado %}
-                                {% for cliente in listaDeClientes %}
-                                    {% if cliente['carrinho'][produto] %}
-                                        <form action="/remover_carrinho" method="post">
-                                            <input type="hidden" name="nome_produto" value="{{produto}}">
-                                            <input type="hidden" name="pagina_retorno" value="/">
-                                            <input type="submit" id="btn_remover_carrinho" value="Remover do Carrinho">
-                                        </form>
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
 
 
 
 
 
-                        </div>
-
+                            </div>
+                        {% endif %}
                     {% endfor %}
-                {% endif %}
+               
             {% endfor %}
 
 

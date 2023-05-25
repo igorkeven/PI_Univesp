@@ -1,24 +1,21 @@
 [
     {
         "nome": "teste 1 ",
-        "email": "teste@teste.com",
+        "email": "cliente@teste.com",
         "senha": "123",
         "foto": "",
-        "carrinho": {},
+        "carrinho": {
+            "banana nanica": {
+            "imagem": "foto_produtoteste@teste.com_banana nanica.jpg",
+            "descricao": "banana do tipo nanica",
+            "preco": 100.0,
+            "email_vendedor": "teste@teste.com",
+            "quantidade": 1
+        }
+    },
         "total_preco": 0.0,
         "historico": [
-            {
-                "compras_finalizadas": {
-                    "banana nanica": {
-                        "imagem": "foto_produtoteste@teste.com_banana nanica.jpg",
-                        "descricao": "banana do tipo nanica",
-                        "preco": 100.0,
-                        "email_vendedor": "teste@teste.com",
-                        "quantidade": 1
-                    }
-                },
-                "compra_feita_em": "19-05-23 12:44:49"
-            },
+            
             {
                 "compras_finalizadas": {
                     "banana ": {
